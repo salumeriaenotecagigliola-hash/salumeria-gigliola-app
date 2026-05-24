@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permissive rules for testing/migration phase
+    match /orders/{orderId} {
+      allow read, write: if true;
+    }
+    match /waiterCalls/{callId} {
+      allow read, write: if true;
+    }
+    match /takeaway/{docId} {
+      allow read, write: if true;
+    }
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /extras/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /categories/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email.lower() == 'salumeriaenotecagigliola@gmail.com' ||
+        request.auth.token.email.lower() == 'beatrice.gigliola@gmail.com' ||
+        request.auth.token.email.lower() == 'beatricegigliola@gmail.com' ||
+        request.auth.token.email.lower() == 'gigliolabeatrice@gmail.com' ||
+        request.auth.token.email.lower() == 'beatrice.gigliola8@gmail.com' ||
+        request.auth.token.email.lower() == 'samgigliola@gmail.com' ||
+        request.auth.token.email.lower() == 'massfrancy98@gmail.com'
+      );
+    }
+    
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

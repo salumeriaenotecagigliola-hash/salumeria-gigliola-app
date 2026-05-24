@@ -1,0 +1,110 @@
+{
+  "entities": {
+    "TakeawayHours": {
+      "title": "TakeawayHours",
+      "description": "Orari di apertura per l'asporto giornalieri",
+      "type": "object",
+      "properties": {
+        "mon": { "$ref": "#/entities/DayConfig" },
+        "tue": { "$ref": "#/entities/DayConfig" },
+        "wed": { "$ref": "#/entities/DayConfig" },
+        "thu": { "$ref": "#/entities/DayConfig" },
+        "fri": { "$ref": "#/entities/DayConfig" },
+        "sat": { "$ref": "#/entities/DayConfig" },
+        "sun": { "$ref": "#/entities/DayConfig" }
+      }
+    },
+    "DayConfig": {
+       "title": "DayConfig",
+       "type": "object",
+       "properties": {
+         "open": { "type": "string" },
+         "close": { "type": "string" },
+         "closed": { "type": "boolean" }
+       }
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "Impostazione generica",
+      "type": "object",
+      "properties": {
+        "metadata": { "type": "object" }
+      }
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Un prodotto nel menu (vino, tagliere, ecc.)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "price": { "type": "number" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "available": { "type": "boolean" }
+      },
+      "required": ["name", "category", "price", "available"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Un ordine effettuato da un tavolo",
+      "type": "object",
+      "properties": {
+        "tableNumber": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productId": { "type": "string" },
+              "name": { "type": "string" },
+              "price": { "type": "number" },
+              "quantity": { "type": "number" }
+            }
+          }
+        },
+        "total": { "type": "number" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "preparing", "served", "paid", "cancelled"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tableNumber", "items", "total", "status", "createdAt", "updatedAt"]
+    },
+    "Extra": {
+      "title": "Extra",
+      "description": "Ingrediente extra aggiuntivo per i prodotti",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "targets": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["name", "price", "targets"]
+    }
+  },
+  "firestore": {
+    "extras": {
+      "schema": "Extra",
+      "description": "Ingredienti extra e loro applicazioni"
+    },
+    "products": {
+      "schema": "Product",
+      "description": "Menu dei prodotti"
+    },
+    "orders": {
+      "schema": "Order",
+      "description": "Ordini dei clienti"
+    },
+    "settings": {
+      "schema": "Setting",
+      "description": "Impostazioni generali del sistema"
+    },
+    "settings/takeawayHours": {
+      "schema": "TakeawayHours",
+      "description": "Orari di apertura per l'asporto"
+    }
+  }
+}
