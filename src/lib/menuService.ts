@@ -48,10 +48,21 @@ export const getMenu = (): Product[] => {
           pChanged = true;
         }
 
-        if (sourceItem && sourceItem.allergens) {
-          // If the allergens are different, update them
-          if (JSON.stringify(newP.allergens) !== JSON.stringify(sourceItem.allergens)) {
+        if (sourceItem) {
+          if (sourceItem.allergens && JSON.stringify(newP.allergens) !== JSON.stringify(sourceItem.allergens)) {
             newP.allergens = sourceItem.allergens;
+            pChanged = true;
+          }
+          if (sourceItem.name && JSON.stringify(newP.name) !== JSON.stringify(sourceItem.name)) {
+            newP.name = sourceItem.name;
+            pChanged = true;
+          }
+          if (sourceItem.category && JSON.stringify(newP.category) !== JSON.stringify(sourceItem.category)) {
+            newP.category = sourceItem.category;
+            pChanged = true;
+          }
+          if (sourceItem.description && JSON.stringify(newP.description) !== JSON.stringify(sourceItem.description)) {
+            newP.description = sourceItem.description;
             pChanged = true;
           }
         }

@@ -3574,11 +3574,10 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                 <div className="flex gap-2 mb-4">
                   <button
                     onClick={() => {
-                        const newDoc = "nessuno";
                         setEditingPayment({
                             ...editingPayment, 
-                            documentType: newDoc,
-                            invoiceData: newDoc === "fattura" ? (editingPayment.invoiceData || invoiceData) : null
+                            documentType: "nessuno",
+                            invoiceData: null
                         });
                     }}
                     className={`flex-1 py-3 px-2 text-[10px] text-center rounded-xl border font-black uppercase tracking-widest transition-all ${editingPayment.documentType === "nessuno" || !editingPayment.documentType ? "bg-brand-black text-brand-gold border-brand-black shadow-md" : "bg-white text-brand-black/60 hover:bg-brand-black/5 border-brand-black/10"}`}
@@ -3587,11 +3586,10 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   </button>
                   <button
                     onClick={() => {
-                        const newDoc = "scontrino";
                         setEditingPayment({
                             ...editingPayment, 
-                            documentType: newDoc,
-                            invoiceData: newDoc === "fattura" ? (editingPayment.invoiceData || invoiceData) : null
+                            documentType: "scontrino",
+                            invoiceData: null
                         });
                     }}
                     className={`flex-1 py-3 px-2 text-[10px] text-center rounded-xl border font-black uppercase tracking-widest transition-all ${editingPayment.documentType === "scontrino" ? "bg-brand-black text-brand-gold border-brand-black shadow-md" : "bg-white text-brand-black/60 hover:bg-brand-black/5 border-brand-black/10"}`}

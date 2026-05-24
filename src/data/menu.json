@@ -3,17 +3,20 @@
     "category": {
       "it": "Le Formule Aperitivo",
       "en": "Aperitif Formulas",
-      "de": "Aperitif-Angebote"
+      "de": "Aperitif-Angebote",
+      "fr": "Formules Apéritif"
     },
     "name": {
       "it": "Aperitivo Alcolico",
       "en": "Alcoholic Aperitif",
-      "de": "Alkoholischer Aperitif"
+      "de": "Alkoholischer Aperitif",
+      "fr": "Apéritif Alcoolisé"
     },
     "description": {
       "it": "1 bevanda alcolica a scelta (calice di vino, cocktail o birra) + Tagliere misto accompagnato da pane e friselline della casa.",
       "en": "1 choice of alcoholic beverage (glass of wine, cocktail or beer) + Mixed platter accompanied by house bread and friselline.",
-      "de": "1 alkoholisches Getränk nach Wahl (Glas Wein, Cocktail oder Bier) + Gemischte Platte mit Hausbrot und Friselline."
+      "de": "1 alkoholisches Getränk nach Wahl (Glas Wein, Cocktail oder Bier) + Gemischte Platte mit Hausbrot und Friselline.",
+      "fr": "1 boisson alcoolisée au choix (verre de vin, cocktail ou bière) + Planche mixte accompagnée de pain et frisellines maison."
     },
     "price": 10,
     "available": true,
@@ -26,17 +29,20 @@
     "category": {
       "it": "Le Formule Aperitivo",
       "en": "Aperitif Formulas",
-      "de": "Aperitif-Angebote"
+      "de": "Aperitif-Angebote",
+      "fr": "Formules Apéritif"
     },
     "name": {
       "it": "Aperitivo Analcolico",
       "en": "Non-Alcoholic Aperitif",
-      "de": "Alkoholfreier Aperitif"
+      "de": "Alkoholfreier Aperitif",
+      "fr": "Apéritif Sans Alcool"
     },
     "description": {
       "it": "1 bevanda analcolica a scelta (es. acqua, Coca-Cola, tè, succhi) + Tagliere misto accompagnato da pane e friselline della casa.",
-      "en": "1 choice of non-alcoholic beverage (e.g. water, Coca-Cola, tea, juices) + Mixed platter accompanied by house bread and friselline.",
-      "de": "1 alkoholfreies Getränk nach Wahl (z.B. Wasser, Coca-Cola, Tee, Säfte) + Gemischte Platte mit Hausbrot und Friselline."
+      "en": "1 choice of non-alcoholic beverage + Mixed platter accompanied by house bread and friselline.",
+      "de": "1 alkoholfreies Getränk nach Wahl + Gemischte Platte mit Hausbrot und Friselline.",
+      "fr": "1 boisson non alcoolisée au choix + Planche mixte accompagnée de pain maison."
     },
     "price": 8,
     "available": true,
@@ -48,18 +54,21 @@
   {
     "category": {
       "it": "Bruschette (4 pezzi)",
-      "en": "Bruschette (4 pieces)",
-      "de": "Bruschette (4 Stück)"
+      "en": "Bruschettas (4 pieces)",
+      "de": "Bruschetta (4 Stück)",
+      "fr": "Bruschettas (4 pièces)"
     },
     "name": {
       "it": "La Classica",
       "en": "The Classic",
-      "de": "Der Klassiker"
+      "de": "Der Klassiker",
+      "fr": "Le Classique"
     },
     "description": {
       "it": "Pomodorini freschi, origano e olio EVO",
-      "en": "Fresh cherry tomatoes, oregano and extra virgin olive oil",
-      "de": "Frische Kirschtomaten, Oregano und extra natives Olivenöl"
+      "en": "Fresh cherry tomatoes, oregano and EVOO",
+      "de": "Frische Kirschtomaten, Oregano und extra natives Olivenöl",
+      "fr": "Tomates cerises fraîches, origan et huile d'olive vierge extra"
     },
     "price": 4,
     "available": true,
@@ -70,18 +79,21 @@
   {
     "category": {
       "it": "Bruschette (4 pezzi)",
-      "en": "Bruschette (4 pieces)",
-      "de": "Bruschette (4 Stück)"
+      "en": "Bruschettas (4 pieces)",
+      "de": "Bruschetta (4 Stück)",
+      "fr": "Bruschettas (4 pièces)"
     },
     "name": {
       "it": "La Pugliese",
       "en": "The Apulian",
-      "de": "Die Apulische"
+      "de": "Apulische Art",
+      "fr": "L'Apulien"
     },
     "description": {
       "it": "Stracciatella, Capocollo locale e granella di pistacchio",
       "en": "Stracciatella, local Capocollo and chopped pistachios",
-      "de": "Stracciatella, regionaler Capocollo und gehackte Pistazien"
+      "de": "Stracciatella, lokaler Capocollo und gehackte Pistazien",
+      "fr": "Stracciatella, Capocollo local et éclats de pistache"
     },
     "price": 6,
     "available": true,
@@ -91,26 +103,38 @@
       "Frutta a guscio"
     ],
     "baseIngredients": [
-      { "name": "Stracciatella", "category": "Formaggio" },
-      { "name": "Capocollo", "category": "Salume" },
-      { "name": "Pistacchio", "category": "Altro" }
+      {
+        "name": "Stracciatella",
+        "category": "Formaggio"
+      },
+      {
+        "name": "Capocollo",
+        "category": "Salume"
+      },
+      {
+        "name": "Pistacchio",
+        "category": "Altro"
+      }
     ]
   },
   {
     "category": {
       "it": "Bruschette (4 pezzi)",
-      "en": "Bruschette (4 pieces)",
-      "de": "Bruschette (4 Stück)"
+      "en": "Bruschettas (4 pieces)",
+      "de": "Bruschetta (4 Stück)",
+      "fr": "Bruschettas (4 pièces)"
     },
     "name": {
       "it": "La Golosa",
-      "en": "The Greedy",
-      "de": "Der Feinschmecker"
+      "en": "The Gluttonous",
+      "de": "Die Naschkatze",
+      "fr": "Le Gourmand"
     },
     "description": {
       "it": "Speck, noci e miele",
       "en": "Speck, walnuts and honey",
-      "de": "Speck, Walnüsse und Honig"
+      "de": "Speck, Walnüsse und Honig",
+      "fr": "Speck, noix et miel"
     },
     "price": 5,
     "available": true,
@@ -123,17 +147,20 @@
     "category": {
       "it": "Friselline Pugliesi",
       "en": "Apulian Friselline",
-      "de": "Apulische Friselline"
+      "de": "Apulische Friselline",
+      "fr": "Frisellines des Pouilles"
     },
     "name": {
       "it": "Tradizionale",
       "en": "Traditional",
-      "de": "Traditionell"
+      "de": "Traditionell",
+      "fr": "Traditionnel"
     },
     "description": {
       "it": "Pomodorini, sale e giro d'olio EVO",
-      "en": "Cherry tomatoes, salt and a drizzle of extra virgin olive oil",
-      "de": "Kirschtomaten, Salz und etwas extra natives Olivenöl"
+      "en": "Cherry tomatoes, salt and a touch of EVOO",
+      "de": "Kirschtomaten, Salz und ein Schuss Olivenöl",
+      "fr": "Tomates cerises, sel et filet d'huile d'olive"
     },
     "price": 4,
     "available": true,
@@ -145,17 +172,20 @@
     "category": {
       "it": "Friselline Pugliesi",
       "en": "Apulian Friselline",
-      "de": "Apulische Friselline"
+      "de": "Apulische Friselline",
+      "fr": "Frisellines des Pouilles"
     },
     "name": {
       "it": "Delizia",
       "en": "Delight",
-      "de": "Genuss"
+      "de": "Köstlichkeit",
+      "fr": "Délice"
     },
     "description": {
       "it": "Stracciatella e alici",
       "en": "Stracciatella and anchovies",
-      "de": "Stracciatella und Sardellen"
+      "de": "Stracciatella und Sardellen",
+      "fr": "Stracciatella et anchois"
     },
     "price": 6,
     "available": true,
@@ -169,17 +199,20 @@
     "category": {
       "it": "Friselline Pugliesi",
       "en": "Apulian Friselline",
-      "de": "Apulische Friselline"
+      "de": "Apulische Friselline",
+      "fr": "Frisellines des Pouilles"
     },
     "name": {
       "it": "Cegliese",
       "en": "Cegliese",
-      "de": "Nach Art von Ceglie"
+      "de": "Cegliese",
+      "fr": "Cegliese"
     },
     "description": {
       "it": "Tonno, capperi e provolone piccante",
-      "en": "Tuna, capers and spicy provolone",
-      "de": "Thunfisch, Kapern und scharfer Provolone"
+      "en": "Tuna, capers and spicy provolone cheese",
+      "de": "Thunfisch, Kapern und pikanter Provolone",
+      "fr": "Thon, câpres et provolone épicé"
     },
     "price": 5,
     "available": true,
@@ -192,18 +225,21 @@
   {
     "category": {
       "it": "Sfiziosità",
-      "en": "Delicacies",
-      "de": "Köstlichkeiten"
+      "en": "Appetizers",
+      "de": "Häppchen",
+      "fr": "Amuse-gueules"
     },
     "name": {
       "it": "Tris del Territorio",
-      "en": "Local Tris",
-      "de": "Regionales Trio"
+      "en": "Local Trio",
+      "de": "Lokales Trio",
+      "fr": "Trio Local"
     },
     "description": {
       "it": "Tarallini artigianali, patatine e olive dolci",
-      "en": "Artisanal Tarallini, chips and sweet olives",
-      "de": "Handgemachte Tarallini, Chips und süße Oliven"
+      "en": "Artisanal taralli, potato chips and sweet olives",
+      "de": "Hausgemachte Taralli, Chips und süße Oliven",
+      "fr": "Taralli artisanaux, chips et olives douces"
     },
     "price": 1.5,
     "available": true,
@@ -214,18 +250,21 @@
   {
     "category": {
       "it": "Sfiziosità",
-      "en": "Delicacies",
-      "de": "Köstlichkeiten"
+      "en": "Appetizers",
+      "de": "Häppchen",
+      "fr": "Amuse-gueules"
     },
     "name": {
       "it": "Focaccia Farcita",
       "en": "Stuffed Focaccia",
-      "de": "Gefüllte Focaccia"
+      "de": "Gefüllte Focaccia",
+      "fr": "Focaccia Farcie"
     },
     "description": {
       "it": "Trancio di focaccia locale con un salume e un formaggio a tua scelta",
-      "en": "Slice of local focaccia with a cold cut and a cheese of your choice",
-      "de": "Ein Stück regionale Focaccia mit Aufschnitt und Käse nach Wahl"
+      "en": "Slice of local focaccia with a choice of cured meat and cheese",
+      "de": "Lokales Focaccia-Stück mit Wurst und Käse nach Wahl",
+      "fr": "Part de focaccia locale avec une charcuterie et un fromage au choix"
     },
     "price": 3,
     "available": true,
@@ -237,18 +276,21 @@
   {
     "category": {
       "it": "Sfiziosità",
-      "en": "Delicacies",
-      "de": "Köstlichkeiten"
+      "en": "Appetizers",
+      "de": "Häppchen",
+      "fr": "Amuse-gueules"
     },
     "name": {
       "it": "Ciotolina di Nodini",
       "en": "Bowl of Nodini",
-      "de": "Schale mit Nodini"
+      "de": "Schale mit Nodini",
+      "fr": "Bol de Nodini"
     },
     "description": {
       "it": "Freschissimi nodini di mozzarella locale dal nostro banco casaro",
-      "en": "Very fresh local mozzarella nodini from our dairy counter",
-      "de": "Frische Nodini (Mozzarella) aus der Region von unserer Käsetheke"
+      "en": "Fresh mozzarella knots from our cheesemaker's counter",
+      "de": "Frische Mozzarella-Knötchen von unserer Käsetheke",
+      "fr": "Nœuds de mozzarella frais de notre fromagerie"
     },
     "price": 4,
     "available": true,
@@ -259,18 +301,21 @@
   {
     "category": {
       "it": "Sfiziosità",
-      "en": "Delicacies",
-      "de": "Köstlichkeiten"
+      "en": "Appetizers",
+      "de": "Häppchen",
+      "fr": "Amuse-gueules"
     },
     "name": {
       "it": "Ciotolina di Bufala",
       "en": "Bowl of Buffalo Mozzarella",
-      "de": "Schale mit Büffelmozzarella"
+      "de": "Schale mit Büffelmozzarella",
+      "fr": "Bol de Mozzarella de Bufflonne"
     },
     "description": {
       "it": "Bocconcini di vera mozzarella di bufala",
-      "en": "Real buffalo mozzarella bites",
-      "de": "Echte Büffelmozzarella-Häppchen"
+      "en": "Buffalo mozzarella bocconcini",
+      "de": "Echte Büffelmozzarella-Bällchen",
+      "fr": "Bouchées de vraie mozzarella de bufflonne"
     },
     "price": 5,
     "available": true,
@@ -281,18 +326,21 @@
   {
     "category": {
       "it": "Sfiziosità",
-      "en": "Delicacies",
-      "de": "Köstlichkeiten"
+      "en": "Appetizers",
+      "de": "Häppchen",
+      "fr": "Amuse-gueules"
     },
     "name": {
       "it": "Cartoccio di Panzerottini",
-      "en": "Cartoccio of Panzerottini",
-      "de": "Tüte Panzerottini"
+      "en": "Cone of Panzerottini",
+      "de": "Tüte mit Panzerottini",
+      "fr": "Cornet de Panzerottini"
     },
     "description": {
       "it": "I classici panzerottini pugliesi ripieni, serviti caldi e filanti",
-      "en": "The classic stuffed Apulian panzerottini, served hot and stringy",
-      "de": "Klassische gefüllte apulische Panzerottini, heiß und zerlaufen serviert"
+      "en": "Classic filled Apulian panzerottini, served hot and gooey",
+      "de": "Klassisch gefüllte apulische Panzerottini, heiß und zerlaufen serviert",
+      "fr": "Petits panzerotti des Pouilles farcis classiques, servis chauds e fondants"
     },
     "price": 4.5,
     "available": true,
@@ -304,18 +352,21 @@
   {
     "category": {
       "it": "I Nostri Taglieri",
-      "en": "Our Platters",
-      "de": "Unsere Platten"
+      "en": "Our Charcuterie Boards",
+      "de": "Unsere Platten",
+      "fr": "Nos Planches"
     },
     "name": {
       "it": "L'Asse del Salumiere",
-      "en": "The Delicatessen Board",
-      "de": "Die Platte des Metzgers"
+      "en": "The Charcutier's Board",
+      "de": "Das Brett des Fleischers",
+      "fr": "La Planche du Charcutier"
     },
     "description": {
       "it": "Selezione dei nostri migliori salumi artigianali",
-      "en": "Selection of our best artisanal cold cuts",
-      "de": "Auswahl unserer besten handwerklichen Wurstwaren"
+      "en": "Selection of our best artisanal cured meats",
+      "de": "Auswahl unserer besten handwerklichen Wurstwaren",
+      "fr": "Sélection de nos meilleures charcuteries artisanales"
     },
     "price": 14,
     "available": true,
@@ -327,18 +378,21 @@
   {
     "category": {
       "it": "I Nostri Taglieri",
-      "en": "Our Platters",
-      "de": "Unsere Platten"
+      "en": "Our Charcuterie Boards",
+      "de": "Unsere Platten",
+      "fr": "Nos Planches"
     },
     "name": {
       "it": "L'Asse del Casaro",
       "en": "The Cheesemaker's Board",
-      "de": "Die Käseplatte"
+      "de": "Das Brett des Käsers",
+      "fr": "La Planche du Fromager"
     },
     "description": {
       "it": "Degustazione di formaggi freschi e stagionati serviti con confetture",
       "en": "Tasting of fresh and aged cheeses served with jams",
-      "de": "Verkostung von frischem und gereiftem Käse, serviert mit Marmeladen"
+      "de": "Verkostung von frischem und gereiftem Käse mit Konfitüren",
+      "fr": "Dégustation de fromages frais et affinés servis avec des confitures"
     },
     "price": 18,
     "available": true,
@@ -350,18 +404,21 @@
   {
     "category": {
       "it": "I Nostri Taglieri",
-      "en": "Our Platters",
-      "de": "Unsere Platten"
+      "en": "Our Charcuterie Boards",
+      "de": "Unsere Platten",
+      "fr": "Nos Planches"
     },
     "name": {
       "it": "Tagliere Misto Classico",
       "en": "Classic Mixed Platter",
-      "de": "Klassische gemischte Platte"
+      "de": "Klassische Gemischte Platte",
+      "fr": "Planche Mixte Classique"
     },
     "description": {
       "it": "Il perfetto equilibrio tra la selezione di salumi e i formaggi",
-      "en": "The perfect balance between the selection of cold cuts and cheeses",
-      "de": "Die perfekte Balance zwischen der Auswahl an Aufschnitt und Käse"
+      "en": "The perfect balance between the selection of cured meats and cheeses",
+      "de": "Die perfekte Balance zwischen Wurst- und Käseauswahl",
+      "fr": "L'équilibre parfait entre la sélection de charcuteries et de fromages"
     },
     "price": 16,
     "available": true,
@@ -373,18 +430,21 @@
   {
     "category": {
       "it": "I Nostri Taglieri",
-      "en": "Our Platters",
-      "de": "Unsere Platten"
+      "en": "Our Charcuterie Boards",
+      "de": "Unsere Platten",
+      "fr": "Nos Planches"
     },
     "name": {
       "it": "Il \"Gran Gigliola\"",
-      "en": "The \"Gran Gigliola\"",
-      "de": "Die \"Gran Gigliola\""
+      "en": "The \"Grand Gigliola\"",
+      "de": "Der \"Große Gigliola\"",
+      "fr": "Le \"Grand Gigliola\""
     },
     "description": {
       "it": "Componi il tagliere con i tuoi prodotti preferiti (Prezzo al Kg - chiedi allo staff)",
-      "en": "Compose the platter with your favorite products (Price per Kg - ask the staff)",
-      "de": "Stellen Sie die Platte mit Ihren Lieblingsprodukten zusammen (Preis pro Kg - fragen Sie das Personal)"
+      "en": "Create the board with your favorite products (Price per kg - ask the staff)",
+      "de": "Stellen Sie Ihr Brett selbst zusammen (Preis pro kg - fragen Sie das Personal)",
+      "fr": "Composez la planche avec vos produits préférés (Prix au kg - demandez au personnel)"
     },
     "price": 0,
     "available": true,
@@ -397,18 +457,21 @@
   {
     "category": {
       "it": "I Piatti",
-      "en": "The Dishes",
-      "de": "Die Gerichte"
+      "en": "Plates",
+      "de": "Tellergerichte",
+      "fr": "Plats"
     },
     "name": {
       "it": "Il Classico (Crudo e Bufala)",
-      "en": "The Classic (Prosciutto and Buffalo Mozzarella)",
-      "de": "Der Klassiker (Rohschinken und Büffelmozzarella)"
+      "en": "The Classic (Prosciutto & Buffalo)",
+      "de": "Der Klassiker (Prosciutto & Büffel)",
+      "fr": "Le Classique (Jambon cru et Bufflonne)"
     },
     "description": {
       "it": "Prosciutto crudo stagionato tagliato fresco al banco e bocconcini di mozzarella di bufala",
-      "en": "Aged prosciutto freshly sliced at the counter and buffalo mozzarella bites",
-      "de": "Gereifter Rohschinken, frisch an der Theke geschnitten, und Büffelmozzarella-Häppchen"
+      "en": "Freshly sliced aged raw ham and buffalo mozzarella bocconcini",
+      "de": "Frisch geschnittener gereifter Rohschinken und Büffelmozzarella-Bällchen",
+      "fr": "Jambon cru affiné tranché minute au comptoir et bocconcini de bufflonne"
     },
     "price": 10,
     "available": true,
@@ -419,18 +482,21 @@
   {
     "category": {
       "it": "I Piatti",
-      "en": "The Dishes",
-      "de": "Die Gerichte"
+      "en": "Plates",
+      "de": "Tellergerichte",
+      "fr": "Plats"
     },
     "name": {
       "it": "Carpaccio di Bresaola",
       "en": "Bresaola Carpaccio",
-      "de": "Bresaola-Carpaccio"
+      "de": "Bresaola Carpaccio",
+      "fr": "Carpaccio de Bresaola"
     },
     "description": {
       "it": "Bresaola Punta d'Anca affettata finemente, rucola fresca, scaglie di Grana e un filo d'olio EVO",
-      "en": "Thinly sliced Bresaola Punta d'Anca, fresh arugula, Grana flakes and a drizzle of extra virgin olive oil",
-      "de": "Fein geschnittene Bresaola Punta d'Anca, frischer Rucola, Grana-Splitter und etwas extra natives Olivenöl"
+      "en": "Finely sliced Punta d'Anca Bresaola, fresh arugula, parmesan shavings and a drizzle of EVOO",
+      "de": "Fein geschnittene Bresaola Punta d'Anca, frischer Rucola, Grana-Splitter und ein Schuss Olivenöl",
+      "fr": "Bresaola Punta d'Anca finement tranchée, roquette fraîche, copeaux de parmesan et filet d'huile d'olive"
     },
     "price": 10,
     "available": true,
@@ -441,18 +507,21 @@
   {
     "category": {
       "it": "I Piatti",
-      "en": "The Dishes",
-      "de": "Die Gerichte"
+      "en": "Plates",
+      "de": "Tellergerichte",
+      "fr": "Plats"
     },
     "name": {
       "it": "Il Re di Puglia",
       "en": "The King of Apulia",
-      "de": "Der König von Apulien"
+      "de": "Der König von Apulien",
+      "fr": "Le Roi des Pouilles"
     },
     "description": {
       "it": "Capocollo artigianale servito con una burratina intera centrale e pomodori secchi sott'olio",
-      "en": "Artisanal Capocollo served with a whole central burratina and sun-dried tomatoes in oil",
-      "de": "Handwerklicher Capocollo, serviert con una burratina intera centrale e pomodori secchi sott'olio"
+      "en": "Artisanal Capocollo served with a whole small burrata and sun-dried tomatoes in oil",
+      "de": "Handwerklicher Capocollo mit ganzer kleiner Burrata und eingelegten getrockneten Tomaten",
+      "fr": "Capocollo artisanal servi avec une petite burrata entière au centre et tomates séchées à l'huile"
     },
     "price": 12,
     "available": true,
@@ -464,17 +533,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "Il Fabbricatore",
-      "en": "The Fabricator",
-      "de": "Der Fabrikant"
+      "en": "The Maker",
+      "de": "Der Macher",
+      "fr": "Le Fabricant"
     },
     "description": {
       "it": "Mortadella, salame piccante, pancetta e provolone piccante",
       "en": "Mortadella, spicy salami, pancetta and spicy provolone",
-      "de": "Mortadella, scharfe Salami, Pancetta und scharfer Provolone"
+      "de": "Mortadella, scharfe Salami, Pancetta und pikanter Provolone",
+      "fr": "Mortadelle, salami piquant, pancetta et provolone épicé"
     },
     "price": 4.5,
     "available": true,
@@ -488,17 +560,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "Sapeva di Picca",
-      "en": "Tasted like Picca",
-      "de": "Schmeckte nach Picca"
+      "en": "Just a Taste",
+      "de": "Nur ein Geschmack",
+      "fr": "Un Zeste"
     },
     "description": {
       "it": "Mortadella, stracciatella, granella di pistacchio e guanciale",
       "en": "Mortadella, stracciatella, chopped pistachios and guanciale",
-      "de": "Mortadella, Stracciatella, gehackte Pistazien und Guanciale"
+      "de": "Mortadella, Stracciatella, gehackte Pistazien und Guanciale",
+      "fr": "Mortadelle, stracciatella, éclats de pistache et guanciale"
     },
     "price": 4.5,
     "available": true,
@@ -512,17 +587,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "Cegliese",
       "en": "Cegliese",
-      "de": "Nach Art von Ceglie"
+      "de": "Cegliese",
+      "fr": "Cegliese"
     },
     "description": {
       "it": "Mortadella, tonno, capperi e provolone piccante",
       "en": "Mortadella, tuna, capers and spicy provolone",
-      "de": "Mortadella, Thunfisch, Kapern und scharfer Provolone"
+      "de": "Mortadella, Thunfisch, Kapern und pikanter Provolone",
+      "fr": "Mortadelle, thon, câpres et provolone épicé"
     },
     "price": 4.5,
     "available": true,
@@ -536,17 +614,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "Tirolese",
       "en": "Tyrolean",
-      "de": "Tiroler"
+      "de": "Tiroler",
+      "fr": "Tyrolien"
     },
     "description": {
       "it": "Speck, formaggio erborinato e verdure grigliate",
       "en": "Speck, blue cheese and grilled vegetables",
-      "de": "Speck, Blauschimmelkäse und gegrilltes Gemüse"
+      "de": "Speck, Blauschimmelkäse und gegrilltes Gemüse",
+      "fr": "Speck, fromage à pâte persillée et légumes grillés"
     },
     "price": 4.5,
     "available": true,
@@ -559,17 +640,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "Coppa di Testa",
-      "en": "Coppa di Testa",
-      "de": "Schweinskopfsülze"
+      "en": "Head Cheese",
+      "de": "Presskopf",
+      "fr": "Fromage de Tête"
     },
     "description": {
       "it": "Coppa di testa, rucola, scaglie di grana, limone, pepe e olio EVO",
-      "en": "Coppa di testa, arugula, Grana flakes, lemon, pepper and extra virgin olive oil",
-      "de": "Schweinskopfsülze, Rucola, Grana-Splitter, Zitrone, Pfeffer und extra natives Olivenöl"
+      "en": "Head cheese, arugula, parmesan shavings, lemon, pepper and EVOO",
+      "de": "Presskopf, Rucola, Grana-Splitter, Zitrone, Pfeffer und Olivenöl",
+      "fr": "Fromage de tête, roquette, copeaux de parmesan, citron, poivre et huile d'olive"
     },
     "price": 4.5,
     "available": true,
@@ -582,17 +666,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "Martinese",
       "en": "Martinese",
-      "de": "Aus Martina Franca"
+      "de": "Martinese",
+      "fr": "Martinese"
     },
     "description": {
       "it": "Capocollo di Martina Franca, stracciatella e pomodori secchi",
       "en": "Capocollo from Martina Franca, stracciatella and sun-dried tomatoes",
-      "de": "Capocollo aus Martina Franca, Stracciatella und getrocknete Tomaten"
+      "de": "Capocollo di Martina Franca, Stracciatella und getrocknete Tomaten",
+      "fr": "Capocollo de Martina Franca, stracciatella et tomates séchées"
     },
     "price": 5,
     "available": true,
@@ -605,17 +692,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "Valtellina",
       "en": "Valtellina",
-      "de": "Veltlin"
+      "de": "Veltliner",
+      "fr": "Valteline"
     },
     "description": {
       "it": "Bresaola Punta d’Anca, grana, noci, rucola, limone, pepe e olio EVO",
-      "en": "Bresaola Punta d’Anca, Grana cheese, walnuts, arugula, lemon, pepper and extra virgin olive oil",
-      "de": "Bresaola Punta d’Anca, Grana, Walnüsse, Rucola, Zitrone, Pfeffer und extra natives Olivenöl"
+      "en": "Punta d'Anca Bresaola, parmesan, walnuts, arugula, lemon, pepper and EVOO",
+      "de": "Bresaola Punta d'Anca, Grana, Walnüsse, Rucola, Zitrone, Pfeffer und Olivenöl",
+      "fr": "Bresaola Punta d'Anca, parmesan, noix, roquette, citron, poivre et huile d'olive"
     },
     "price": 5,
     "available": true,
@@ -629,17 +719,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "Caprese",
       "en": "Caprese",
-      "de": "Caprese"
+      "de": "Caprese",
+      "fr": "Caprese"
     },
     "description": {
       "it": "Prosciutto crudo, mozzarella, pomodoro fresco, origano, sale e olio EVO",
-      "en": "Prosciutto, mozzarella, fresh tomato, oregano, salt and extra virgin olive oil",
-      "de": "Rohschinken, Mozzarella, frische Tomate, Oregano, Salz und extra natives Olivenöl"
+      "en": "Prosciutto, mozzarella, fresh tomato, oregano, salt and EVOO",
+      "de": "Rohschinken, Mozzarella, frische Tomaten, Oregano, Salz und Olivenöl",
+      "fr": "Jambon cru, mozzarella, tomate fraîche, origan, sel et huile d'olive"
     },
     "price": 5,
     "available": true,
@@ -652,17 +745,20 @@
     "category": {
       "it": "I Nostri Panini",
       "en": "Our Sandwiches",
-      "de": "Unsere Sandwiches"
+      "de": "Unsere Sandwiches",
+      "fr": "Nos Sandwichs"
     },
     "name": {
       "it": "A Capu Mea",
-      "en": "A Capu Mea",
-      "de": "A Capu Mea"
+      "en": "My Way",
+      "de": "Auf Meine Art",
+      "fr": "À Ma Façon"
     },
     "description": {
       "it": "Ti fidi del salumiere? Lascia fare a noi: una combinazione a sorpresa",
-      "en": "Do you trust the delicatessen owner? Leave it to us: a surprise combination",
-      "de": "Vertrauen Sie dem Metzger? Überlassen Sie es uns: eine Überraschungskombination"
+      "en": "Trust the charcutier? Leave it to us: a surprise combination",
+      "de": "Können Sie dem Fleischer vertrauen? Überlassen Sie es uns: eine Überraschungskombination",
+      "fr": "Faites-vous confiance au charcutier ? Laissez-nous faire : une combinaison surprise"
     },
     "price": 5.5,
     "available": true,
@@ -675,18 +771,21 @@
   {
     "category": {
       "it": "Le Ciotole - Puglia Bowl",
-      "en": "The Bowls - Puglia Bowl",
-      "de": "Die Schüsseln - Apulien Bowl"
+      "en": "Apulian Bowls",
+      "de": "Apulische Bowls",
+      "fr": "Bols des Pouilles"
     },
     "name": {
       "it": "Puglia Bowl L'Eccellenza",
-      "en": "Puglia Bowl The Excellence",
-      "de": "Apulien Bowl Exzellenz"
+      "en": "The Excellence Bowl",
+      "de": "Die Exzellenz Bowl",
+      "fr": "Bol de L'Excellence"
     },
     "description": {
       "it": "Base frisa/crostoni, burratina, capocollo, pomodori secchi, pistacchio",
-      "en": "Frisa/croutons base, burratina, capocollo, sun-dried tomatoes, pistachios",
-      "de": "Basis Frisa/Croûtons, Burratina, Capocollo, getrocknete Tomaten, Pistazien"
+      "en": "Frisa/crust base, burratina, capocollo, sun-dried tomatoes, pistachio",
+      "de": "Basis Frisa/Röstbrot, Burratina, Capocollo, getrocknete Tomaten, Pistazien",
+      "fr": "Base frisa/croûtons, petite burrata, capocollo, tomates séchées, pistache"
     },
     "price": 10.5,
     "available": true,
@@ -699,18 +798,21 @@
   {
     "category": {
       "it": "Le Ciotole - Puglia Bowl",
-      "en": "The Bowls - Puglia Bowl",
-      "de": "Die Schüsseln - Apulien Bowl"
+      "en": "Apulian Bowls",
+      "de": "Apulische Bowls",
+      "fr": "Bols des Pouilles"
     },
     "name": {
       "it": "Puglia Bowl La Mediterranea",
-      "en": "Puglia Bowl The Mediterranean",
-      "de": "Apulien Bowl Mediteran"
+      "en": "The Mediterranean Bowl",
+      "de": "Die Mediterrane Bowl",
+      "fr": "Bol Méditerranéen"
     },
     "description": {
       "it": "Base frisa/crostoni, bocconcini mozzarella, crudo, pomodorini, olive",
-      "en": "Frisa/croutons base, mozzarella bites, prosciutto, cherry tomatoes, olives",
-      "de": "Basis Frisa/Croûtons, Mozzarella-Häppchen, Rohschinken, Kirschtomaten, Oliven"
+      "en": "Frisa/crust base, mozzarella bocconcini, prosciutto, cherry tomatoes, olives",
+      "de": "Basis Frisa/Röstbrot, Mozzarella-Bällchen, Rohschinken, Kirschtomaten, Oliven",
+      "fr": "Base frisa/croûtons, bocconcini de mozzarella, jambon cru, tomates cerises, olives"
     },
     "price": 10.5,
     "available": true,
@@ -722,18 +824,21 @@
   {
     "category": {
       "it": "Le Ciotole - Puglia Bowl",
-      "en": "The Bowls - Puglia Bowl",
-      "de": "Die Schüsseln - Apulien Bowl"
+      "en": "Apulian Bowls",
+      "de": "Apulische Bowls",
+      "fr": "Bols des Pouilles"
     },
     "name": {
       "it": "Puglia Bowl L'Intensa",
-      "en": "Puglia Bowl The Intense",
-      "de": "Apulien Bowl Intensiv"
+      "en": "The Intense Bowl",
+      "de": "Die Intensive Bowl",
+      "fr": "Bol Intense"
     },
     "description": {
       "it": "Base frisa/crostoni, mortadella, provolone piccante, carciofini, noci",
-      "en": "Frisa/croutons base, mortadella, spicy provolone, baby artichokes, walnuts",
-      "de": "Basis Frisa/Croûtons, Mortadella, scharfer Provolone, Artischockenherzen, Walnüsse"
+      "en": "Frisa/crust base, mortadella, spicy provolone, artichokes, walnuts",
+      "de": "Basis Frisa/Röstbrot, Mortadella, pikanter Provolone, Artischocken, Walnüsse",
+      "fr": "Base frisa/croûtons, mortadelle, provolone épicé, cœurs d'artichauts, noix"
     },
     "price": 10.5,
     "available": true,
@@ -746,18 +851,21 @@
   {
     "category": {
       "it": "Le Ciotole - Puglia Bowl",
-      "en": "The Bowls - Puglia Bowl",
-      "de": "Die Schüsseln - Apulien Bowl"
+      "en": "Apulian Bowls",
+      "de": "Apulische Bowls",
+      "fr": "Bols des Pouilles"
     },
     "name": {
       "it": "Puglia Bowl Componibile",
-      "en": "Customizable Puglia Bowl",
-      "de": "Individuelle Apulien Bowl"
+      "en": "Custom Bowl",
+      "de": "Wunsch-Bowl",
+      "fr": "Bol sur Mesure"
     },
     "description": {
       "it": "Componi il tuo mix perfetto",
-      "en": "Compose your perfect mix",
-      "de": "Stellen Sie Ihren perfekten Mix zusammen"
+      "en": "Create your perfect mix",
+      "de": "Stellen Sie Ihren perfekten Mix zusammen",
+      "fr": "Composez votre mix parfait"
     },
     "price": 8.5,
     "available": true,
@@ -769,17 +877,20 @@
     "category": {
       "it": "Drinks & Cocktails",
       "en": "Drinks & Cocktails",
-      "de": "Getränke & Cocktails"
+      "de": "Getränke & Cocktails",
+      "fr": "Boissons & Cocktails"
     },
     "name": {
       "it": "Spritz",
       "en": "Spritz",
-      "de": "Spritz"
+      "de": "Spritz",
+      "fr": "Spritz"
     },
     "description": {
       "it": "Aperol / Campari",
       "en": "Aperol / Campari",
-      "de": "Aperol / Campari"
+      "de": "Aperol / Campari",
+      "fr": "Aperol / Campari"
     },
     "price": 5,
     "available": true,
@@ -795,17 +906,20 @@
     "category": {
       "it": "Drinks & Cocktails",
       "en": "Drinks & Cocktails",
-      "de": "Getränke & Cocktails"
+      "de": "Getränke & Cocktails",
+      "fr": "Boissons & Cocktails"
     },
     "name": {
       "it": "Gin",
       "en": "Gin",
-      "de": "Gin"
+      "de": "Gin",
+      "fr": "Gin"
     },
     "description": {
       "it": "Gin tonic o lemon",
-      "en": "Gin tonic or lemon",
-      "de": "Gin Tonic oder Lemon"
+      "en": "Gin Tonic or Lemon",
+      "de": "Gin Tonic oder Lemon",
+      "fr": "Gin tonic ou citron"
     },
     "price": 5,
     "available": true,
@@ -818,13 +932,15 @@
   {
     "category": {
       "it": "La Cantina - I Calici",
-      "en": "The Cellar - Glasses of Wine",
-      "de": "Der Weinkeller - Offene Weine"
+      "en": "Wine by the Glass",
+      "de": "Wein im Glas",
+      "fr": "Vin au Verre"
     },
     "name": {
       "it": "Calice di Prosecco",
       "en": "Glass of Prosecco",
-      "de": "Glas Prosecco"
+      "de": "Glas Prosecco",
+      "fr": "Verre de Prosecco"
     },
     "description": {
       "it": "",
@@ -840,13 +956,15 @@
   {
     "category": {
       "it": "La Cantina - I Calici",
-      "en": "The Cellar - Glasses of Wine",
-      "de": "Der Weinkeller - Offene Weine"
+      "en": "Wine by the Glass",
+      "de": "Wein im Glas",
+      "fr": "Vin au Verre"
     },
     "name": {
       "it": "Calice di Vino Bianco",
       "en": "Glass of White Wine",
-      "de": "Glas Weißwein"
+      "de": "Glas Weißwein",
+      "fr": "Verre de Vin Blanc"
     },
     "description": {
       "it": "",
@@ -862,13 +980,15 @@
   {
     "category": {
       "it": "La Cantina - I Calici",
-      "en": "The Cellar - Glasses of Wine",
-      "de": "Der Weinkeller - Offene Weine"
+      "en": "Wine by the Glass",
+      "de": "Wein im Glas",
+      "fr": "Vin au Verre"
     },
     "name": {
       "it": "Calice di Vino Rosato",
       "en": "Glass of Rosé Wine",
-      "de": "Glas Roséwein"
+      "de": "Glas Roséwein",
+      "fr": "Verre de Vin Rosé"
     },
     "description": {
       "it": "",
@@ -884,13 +1004,15 @@
   {
     "category": {
       "it": "La Cantina - I Calici",
-      "en": "The Cellar - Glasses of Wine",
-      "de": "Der Weinkeller - Offene Weine"
+      "en": "Wine by the Glass",
+      "de": "Wein im Glas",
+      "fr": "Vin au Verre"
     },
     "name": {
       "it": "Calice di Vino Rosso",
       "en": "Glass of Red Wine",
-      "de": "Glas Rotwein"
+      "de": "Glas Rotwein",
+      "fr": "Verre de Vin Rouge"
     },
     "description": {
       "it": "",
@@ -907,17 +1029,20 @@
     "category": {
       "it": "I Vini Rossi",
       "en": "Red Wines",
-      "de": "Rotweine"
+      "de": "Rotweine",
+      "fr": "Vins Rouges"
     },
     "name": {
       "it": "Tenute Lu Spada \"Laenius\"",
       "en": "Tenute Lu Spada \"Laenius\"",
-      "de": "Tenute Lu Spada \"Laenius\""
+      "de": "Tenute Lu Spada \"Laenius\"",
+      "fr": "Tenute Lu Spada \"Laenius\""
     },
     "description": {
       "it": "Malvasia Nera",
-      "en": "Black Malvasia",
-      "de": "Schwarzer Malvasia"
+      "en": "Malvasia Nera",
+      "de": "Malvasia Nera",
+      "fr": "Malvasia Nera"
     },
     "price": 15.9,
     "available": true,
@@ -929,17 +1054,20 @@
     "category": {
       "it": "I Vini Rossi",
       "en": "Red Wines",
-      "de": "Rotweine"
+      "de": "Rotweine",
+      "fr": "Vins Rouges"
     },
     "name": {
       "it": "Masseria Li Veli \"Primo Nero\"",
       "en": "Masseria Li Veli \"Primo Nero\"",
-      "de": "Masseria Li Veli \"Primo Nero\""
+      "de": "Masseria Li Veli \"Primo Nero\"",
+      "fr": "Masseria Li Veli \"Primo Nero\""
     },
     "description": {
       "it": "Negroamaro",
       "en": "Negroamaro",
-      "de": "Negroamaro"
+      "de": "Negroamaro",
+      "fr": "Negroamaro"
     },
     "price": 13.9,
     "available": true,
@@ -951,17 +1079,20 @@
     "category": {
       "it": "I Vini Rossi",
       "en": "Red Wines",
-      "de": "Rotweine"
+      "de": "Rotweine",
+      "fr": "Vins Rouges"
     },
     "name": {
       "it": "Vinicola Mediterranea \"Emozione\"",
       "en": "Vinicola Mediterranea \"Emozione\"",
-      "de": "Vinicola Mediterranea \"Emozione\""
+      "de": "Vinicola Mediterranea \"Emozione\"",
+      "fr": "Vinicola Mediterranea \"Emozione\""
     },
     "description": {
       "it": "Negroamaro",
       "en": "Negroamaro",
-      "de": "Negroamaro"
+      "de": "Negroamaro",
+      "fr": "Negroamaro"
     },
     "price": 30.9,
     "available": true,
@@ -973,17 +1104,20 @@
     "category": {
       "it": "I Vini Rossi",
       "en": "Red Wines",
-      "de": "Rotweine"
+      "de": "Rotweine",
+      "fr": "Vins Rouges"
     },
     "name": {
       "it": "Vinicola Mediterranea \"Il Duca\"",
       "en": "Vinicola Mediterranea \"Il Duca\"",
-      "de": "Vinicola Mediterranea \"Il Duca\""
+      "de": "Vinicola Mediterranea \"Il Duca\"",
+      "fr": "Vinicola Mediterranea \"Il Duca\""
     },
     "description": {
       "it": "Primitivo di Manduria",
       "en": "Primitivo di Manduria",
-      "de": "Primitivo di Manduria"
+      "de": "Primitivo di Manduria",
+      "fr": "Primitivo di Manduria"
     },
     "price": 15.9,
     "available": true,
@@ -995,17 +1129,20 @@
     "category": {
       "it": "I Vini Rossi",
       "en": "Red Wines",
-      "de": "Rotweine"
+      "de": "Rotweine",
+      "fr": "Vins Rouges"
     },
     "name": {
       "it": "Tenute Chiaromonte \"Muro Sant'Angelo\"",
       "en": "Tenute Chiaromonte \"Muro Sant'Angelo\"",
-      "de": "Tenute Chiaromonte \"Muro Sant'Angelo\""
+      "de": "Tenute Chiaromonte \"Muro Sant'Angelo\"",
+      "fr": "Tenute Chiaromonte \"Muro Sant'Angelo\""
     },
     "description": {
       "it": "Primitivo",
       "en": "Primitivo",
-      "de": "Primitivo"
+      "de": "Primitivo",
+      "fr": "Primitivo"
     },
     "price": 56.9,
     "available": true,
@@ -1017,17 +1154,20 @@
     "category": {
       "it": "I Vini Rosati",
       "en": "Rosé Wines",
-      "de": "Roséweine"
+      "de": "Roséweine",
+      "fr": "Vins Rosés"
     },
     "name": {
       "it": "Masseria Mita \"Marì\"",
       "en": "Masseria Mita \"Marì\"",
-      "de": "Masseria Mita \"Marì\""
+      "de": "Masseria Mita \"Marì\"",
+      "fr": "Masseria Mita \"Marì\""
     },
     "description": {
       "it": "Negroamaro Rosato Salento",
       "en": "Negroamaro Rosé Salento",
-      "de": "Negroamaro Rosé Salento"
+      "de": "Negroamaro Rosé Salento",
+      "fr": "Negroamaro Rosé Salento"
     },
     "price": 14.9,
     "available": true,
@@ -1039,17 +1179,20 @@
     "category": {
       "it": "I Vini Rosati",
       "en": "Rosé Wines",
-      "de": "Roséweine"
+      "de": "Roséweine",
+      "fr": "Vins Rosés"
     },
     "name": {
       "it": "Palamà \"Metiusco\"",
       "en": "Palamà \"Metiusco\"",
-      "de": "Palamà \"Metiusco\""
+      "de": "Palamà \"Metiusco\"",
+      "fr": "Palamà \"Metiusco\""
     },
     "description": {
       "it": "Negroamaro Rosato Salento",
       "en": "Negroamaro Rosé Salento",
-      "de": "Negroamaro Rosé Salento"
+      "de": "Negroamaro Rosé Salento",
+      "fr": "Negroamaro Rosé Salento"
     },
     "price": 16.9,
     "available": true,
@@ -1061,17 +1204,20 @@
     "category": {
       "it": "I Vini Rosati",
       "en": "Rosé Wines",
-      "de": "Roséweine"
+      "de": "Roséweine",
+      "fr": "Vins Rosés"
     },
     "name": {
       "it": "Scarano",
       "en": "Scarano",
-      "de": "Scarano"
+      "de": "Scarano",
+      "fr": "Scarano"
     },
     "description": {
       "it": "Vino Spumante Negroamaro Rosé",
       "en": "Sparkling Negroamaro Rosé Wine",
-      "de": "Negroamaro Rosé Sekt"
+      "de": "Negroamaro Rosé Schaumwein",
+      "fr": "Vin Pétillant Negroamaro Rosé"
     },
     "price": 28.9,
     "available": true,
@@ -1083,17 +1229,20 @@
     "category": {
       "it": "I Vini Bianchi",
       "en": "White Wines",
-      "de": "Weißweine"
+      "de": "Weißweine",
+      "fr": "Vins Blancs"
     },
     "name": {
       "it": "Masseria Mita \"Ventonuovo\"",
       "en": "Masseria Mita \"Ventonuovo\"",
-      "de": "Masseria Mita \"Ventonuovo\""
+      "de": "Masseria Mita \"Ventonuovo\"",
+      "fr": "Masseria Mita \"Ventonuovo\""
     },
     "description": {
       "it": "Chardonnay Salento",
       "en": "Chardonnay Salento",
-      "de": "Chardonnay Salento"
+      "de": "Chardonnay Salento",
+      "fr": "Chardonnay Salento"
     },
     "price": 11.9,
     "available": true,
@@ -1105,17 +1254,20 @@
     "category": {
       "it": "I Vini Bianchi",
       "en": "White Wines",
-      "de": "Weißweine"
+      "de": "Weißweine",
+      "fr": "Vins Blancs"
     },
     "name": {
       "it": "Tenuta Mastro \"Cupa Nera\"",
       "en": "Tenuta Mastro \"Cupa Nera\"",
-      "de": "Tenuta Mastro \"Cupa Nera\""
+      "de": "Tenuta Mastro \"Cupa Nera\"",
+      "fr": "Tenuta Mastro \"Cupa Nera\""
     },
     "description": {
       "it": "Verdeca",
       "en": "Verdeca",
-      "de": "Verdeca"
+      "de": "Verdeca",
+      "fr": "Verdeca"
     },
     "price": 11.9,
     "available": true,
@@ -1127,17 +1279,20 @@
     "category": {
       "it": "I Vini Bianchi",
       "en": "White Wines",
-      "de": "Weißweine"
+      "de": "Weißweine",
+      "fr": "Vins Blancs"
     },
     "name": {
       "it": "Scarano",
       "en": "Scarano",
-      "de": "Scarano"
+      "de": "Scarano",
+      "fr": "Scarano"
     },
     "description": {
       "it": "Verdeca Vino Spumante Extra Brut",
       "en": "Verdeca Extra Brut Sparkling Wine",
-      "de": "Verdeca Extra Brut Sekt"
+      "de": "Verdeca Extra Brut Schaumwein",
+      "fr": "Verdeca Vin Pétillant Extra Brut"
     },
     "price": 25.9,
     "available": true,
@@ -1149,17 +1304,20 @@
     "category": {
       "it": "Prosecchi",
       "en": "Proseccos",
-      "de": "Prosecco"
+      "de": "Proseccos",
+      "fr": "Proseccos"
     },
     "name": {
       "it": "Casada",
       "en": "Casada",
-      "de": "Casada"
+      "de": "Casada",
+      "fr": "Casada"
     },
     "description": {
       "it": "Prosecco Extra Dry Millesimato",
-      "en": "Prosecco Extra Dry Vintage",
-      "de": "Prosecco Extra Dry Jahrgang"
+      "en": "Prosecco Extra Dry Millesimato",
+      "de": "Prosecco Extra Dry Millesimato",
+      "fr": "Prosecco Extra Dry Millesimato"
     },
     "price": 10.9,
     "available": true,
@@ -1171,17 +1329,20 @@
     "category": {
       "it": "Prosecchi",
       "en": "Proseccos",
-      "de": "Prosecco"
+      "de": "Proseccos",
+      "fr": "Proseccos"
     },
     "name": {
       "it": "Toffoli",
       "en": "Toffoli",
-      "de": "Toffoli"
+      "de": "Toffoli",
+      "fr": "Toffoli"
     },
     "description": {
       "it": "Prosecco DOCG Extra Dry",
       "en": "Prosecco DOCG Extra Dry",
-      "de": "Prosecco DOCG Extra Dry"
+      "de": "Prosecco DOCG Extra Dry",
+      "fr": "Prosecco DOCG Extra Dry"
     },
     "price": 22.5,
     "available": true,
@@ -1192,18 +1353,21 @@
   {
     "category": {
       "it": "Bollicine e Champagne",
-      "en": "Bubbles and Champagne",
-      "de": "Schaumwein und Champagner"
+      "en": "Sparkling & Champagne",
+      "de": "Schaumwein & Champagner",
+      "fr": "Bulles et Champagnes"
     },
     "name": {
       "it": "Berlucchi '61",
       "en": "Berlucchi '61",
-      "de": "Berlucchi '61"
+      "de": "Berlucchi '61",
+      "fr": "Berlucchi '61"
     },
     "description": {
       "it": "Franciacorta Satèn",
       "en": "Franciacorta Satèn",
-      "de": "Franciacorta Satèn"
+      "de": "Franciacorta Satèn",
+      "fr": "Franciacorta Satèn"
     },
     "price": 31.9,
     "available": true,
@@ -1214,18 +1378,21 @@
   {
     "category": {
       "it": "Bollicine e Champagne",
-      "en": "Bubbles and Champagne",
-      "de": "Schaumwein und Champagner"
+      "en": "Sparkling & Champagne",
+      "de": "Schaumwein & Champagner",
+      "fr": "Bulles et Champagnes"
     },
     "name": {
       "it": "Nicolas Feuillatte",
       "en": "Nicolas Feuillatte",
-      "de": "Nicolas Feuillatte"
+      "de": "Nicolas Feuillatte",
+      "fr": "Nicolas Feuillatte"
     },
     "description": {
       "it": "Réserve Exclusive Brut",
       "en": "Réserve Exclusive Brut",
-      "de": "Réserve Exclusive Brut"
+      "de": "Réserve Exclusive Brut",
+      "fr": "Réserve Exclusive Brut"
     },
     "price": 78,
     "available": true,
@@ -1237,12 +1404,14 @@
     "category": {
       "it": "Le Nostre Birre",
       "en": "Our Beers",
-      "de": "Unsere Biere"
+      "de": "Unsere Biere",
+      "fr": "Nos Bières"
     },
     "name": {
       "it": "Peroni (33 cl)",
       "en": "Peroni (33 cl)",
-      "de": "Peroni (33 cl)"
+      "de": "Peroni (33 cl)",
+      "fr": "Peroni (33 cl)"
     },
     "description": {
       "it": "",
@@ -1259,12 +1428,14 @@
     "category": {
       "it": "Le Nostre Birre",
       "en": "Our Beers",
-      "de": "Unsere Biere"
+      "de": "Unsere Biere",
+      "fr": "Nos Bières"
     },
     "name": {
       "it": "Ichnusa Non Filtrata",
       "en": "Unfiltered Ichnusa",
-      "de": "Ichnusa Naturtrüb"
+      "de": "Ichnusa Ungefiltert",
+      "fr": "Ichnusa Non Filtrée"
     },
     "description": {
       "it": "",
@@ -1281,12 +1452,14 @@
     "category": {
       "it": "Le Nostre Birre",
       "en": "Our Beers",
-      "de": "Unsere Biere"
+      "de": "Unsere Biere",
+      "fr": "Nos Bières"
     },
     "name": {
       "it": "Tennent's",
       "en": "Tennent's",
-      "de": "Tennent's"
+      "de": "Tennent's",
+      "fr": "Tennent's"
     },
     "description": {
       "it": "",
@@ -1303,17 +1476,20 @@
     "category": {
       "it": "Le Nostre Birre",
       "en": "Our Beers",
-      "de": "Unsere Biere"
+      "de": "Unsere Biere",
+      "fr": "Nos Bières"
     },
     "name": {
       "it": "Birra dello Stretto",
       "en": "Birra dello Stretto",
-      "de": "Birra dello Stretto"
+      "de": "Birra dello Stretto",
+      "fr": "Birra dello Stretto"
     },
     "description": {
       "it": "Classica, Non Filtrata o Rossa",
       "en": "Classic, Unfiltered or Red",
-      "de": "Klassisch, naturtrüb oder rot"
+      "de": "Klassisch, Ungefiltert oder Rot",
+      "fr": "Classique, Non Filtrée ou Rousse"
     },
     "price": 3.5,
     "available": true,
@@ -1329,13 +1505,15 @@
   {
     "category": {
       "it": "Bevande Analcoliche",
-      "en": "Non-Alcoholic Beverages",
-      "de": "Alkoholfreie Getränke"
+      "en": "Soft Drinks",
+      "de": "Alkoholfreie Getränke",
+      "fr": "Boissons Non Alcoolisées"
     },
     "name": {
       "it": "Acqua (0,5 L)",
       "en": "Water (0.5 L)",
-      "de": "Wasser (0,5 L)"
+      "de": "Wasser (0,5 L)",
+      "fr": "Eau (0.5 L)"
     },
     "description": {
       "it": "",
@@ -1353,18 +1531,21 @@
   {
     "category": {
       "it": "Bevande Analcoliche",
-      "en": "Non-Alcoholic Beverages",
-      "de": "Alkoholfreie Getränke"
+      "en": "Soft Drinks",
+      "de": "Alkoholfreie Getränke",
+      "fr": "Boissons Non Alcoolisées"
     },
     "name": {
       "it": "Bibite Classiche",
-      "en": "Classic Sodas",
-      "de": "Klassische Limonaden"
+      "en": "Classic Soft Drinks",
+      "de": "Klassische Limonaden",
+      "fr": "Sodas Classiques"
     },
     "description": {
       "it": "Coca-Cola, Coca Zero, Fanta, Sprite",
       "en": "Coca-Cola, Coca Zero, Fanta, Sprite",
-      "de": "Coca-Cola, Coca Zero, Fanta, Sprite"
+      "de": "Coca-Cola, Coca Zero, Fanta, Sprite",
+      "fr": "Coca-Cola, Coca Zero, Fanta, Sprite"
     },
     "price": 1.5,
     "available": true,
@@ -1379,18 +1560,21 @@
   {
     "category": {
       "it": "Bevande Analcoliche",
-      "en": "Non-Alcoholic Beverages",
-      "de": "Alkoholfreie Getränke"
+      "en": "Soft Drinks",
+      "de": "Alkoholfreie Getränke",
+      "fr": "Boissons Non Alcoolisées"
     },
     "name": {
       "it": "Tè Freddo",
       "en": "Iced Tea",
-      "de": "Eistee"
+      "de": "Eistee",
+      "fr": "Thé Glacé"
     },
     "description": {
       "it": "Limone o Pesca",
       "en": "Lemon or Peach",
-      "de": "Zitrone oder Pfirsich"
+      "de": "Zitrone oder Pfirsich",
+      "fr": "Citron ou Pêche"
     },
     "price": 1.5,
     "available": true,
@@ -1403,13 +1587,15 @@
   {
     "category": {
       "it": "Bevande Analcoliche",
-      "en": "Non-Alcoholic Beverages",
-      "de": "Alkoholfreie Getränke"
+      "en": "Soft Drinks",
+      "de": "Alkoholfreie Getränke",
+      "fr": "Boissons Non Alcoolisées"
     },
     "name": {
       "it": "Cocktail San Pellegrino",
       "en": "San Pellegrino Cocktail",
-      "de": "San Pellegrino Cocktail"
+      "de": "San Pellegrino Cocktail",
+      "fr": "Cocktail San Pellegrino"
     },
     "description": {
       "it": "",
@@ -1423,13 +1609,15 @@
   {
     "category": {
       "it": "Bevande Analcoliche",
-      "en": "Non-Alcoholic Beverages",
-      "de": "Alkoholfreie Getränke"
+      "en": "Soft Drinks",
+      "de": "Alkoholfreie Getränke",
+      "fr": "Boissons Non Alcoolisées"
     },
     "name": {
       "it": "Red Bull",
       "en": "Red Bull",
-      "de": "Red Bull"
+      "de": "Red Bull",
+      "fr": "Red Bull"
     },
     "description": {
       "it": "",
@@ -1443,18 +1631,21 @@
   {
     "category": {
       "it": "Caffetteria e Digestivi",
-      "en": "Cafeteria and Digestifs",
-      "de": "Kaffee und Digestifs"
+      "en": "Café & Digestifs",
+      "de": "Kaffee & Digestifs",
+      "fr": "Café & Digestifs"
     },
     "name": {
       "it": "Caffè Espresso \"Come a casa\"",
-      "en": "\"Just like home\" Espresso Coffee",
-      "de": "Espresso \"Wie zu Hause\""
+      "en": "Espresso \"Like Home\"",
+      "de": "Espresso \"Wie Zuhause\"",
+      "fr": "Espresso \"Comme à la maison\""
     },
     "description": {
       "it": "in capsula",
-      "en": "capsule",
-      "de": "Kapsel"
+      "en": "in a capsule",
+      "de": "aus der Kapsel",
+      "fr": "en capsule"
     },
     "price": 0.8,
     "available": true,
@@ -1463,13 +1654,15 @@
   {
     "category": {
       "it": "Caffetteria e Digestivi",
-      "en": "Cafeteria and Digestifs",
-      "de": "Kaffee und Digestifs"
+      "en": "Café & Digestifs",
+      "de": "Kaffee & Digestifs",
+      "fr": "Café & Digestifs"
     },
     "name": {
       "it": "Amaro del Salento",
-      "en": "Amaro from Salento",
-      "de": "Amaro aus dem Salento"
+      "en": "Amaro del Salento",
+      "de": "Amaro del Salento",
+      "fr": "Amaro del Salento"
     },
     "description": {
       "it": "",
@@ -1483,13 +1676,15 @@
   {
     "category": {
       "it": "Caffetteria e Digestivi",
-      "en": "Cafeteria and Digestifs",
-      "de": "Kaffee und Digestifs"
+      "en": "Café & Digestifs",
+      "de": "Kaffee & Digestifs",
+      "fr": "Café & Digestifs"
     },
     "name": {
       "it": "Limoncello",
       "en": "Limoncello",
-      "de": "Limoncello"
+      "de": "Limoncello",
+      "fr": "Limoncello"
     },
     "description": {
       "it": "",
