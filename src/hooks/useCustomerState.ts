@@ -628,9 +628,16 @@ export function useCustomerState(props: Props) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(prev => {
+        // La differenza tra il punto di attivazione (220) e quello di disattivazione (10)
+        // deve essere maggiore della variazione di altezza totale degli elementi header/nav (circa 170px)
+        // Questo previene il loop (bounce) dovuto al "scroll anchoring" del browser.
+        if (!prev && window.scrollY > 220) return true;
+        if (prev && window.scrollY < 10) return false;
+        return prev;
+      });
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 

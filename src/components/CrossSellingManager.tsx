@@ -41,9 +41,9 @@ export default function CrossSellingManager() {
   };
 
   return (
-    <div className="bg-white p-6 sm:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] shadow-2xl border border-brand-gold/20">
-      <h2 className="font-logo text-3xl sm:text-5xl mb-8 text-brand-black">Gestione Cross-Selling</h2>
-      <div className="mb-8 p-6 bg-brand-black text-brand-gold rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl border border-brand-gold/30 flex flex-col sm:flex-row gap-6">
+    <div className="bg-white p-12 rounded-[3.5rem] shadow-2xl border border-brand-gold/20">
+      <h2 className="font-logo text-5xl mb-8 text-brand-black">Gestione Cross-Selling</h2>
+      <div className="mb-8 p-6 bg-brand-black text-brand-gold rounded-[2.5rem] shadow-2xl border border-brand-gold/30 flex gap-6">
         <div className="w-16 h-16 bg-brand-gold/20 rounded-full flex items-center justify-center shrink-0">
           <Info className="text-brand-gold" size={32} />
         </div>

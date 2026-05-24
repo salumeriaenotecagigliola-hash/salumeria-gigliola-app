@@ -12,9 +12,11 @@ import {
   where,
   limit,
   getDoc,
+  deleteField
 } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { getMenu } from "../lib/menuService";
+import { generateReceiptPdfBlob } from "../lib/pdfExport";
 import { Order, OrderStatus, Language } from "../types";
 import CustomizationManager from "./CustomizationManager";
 import CrossSellingManager from "./CrossSellingManager";
@@ -39,7 +41,10 @@ import {
   X,
   Edit2,
   Edit,
-  Receipt
+  Share2,
+  Lock as LockIcon,
+  CreditCard,
+  Landmark
 } from "lucide-react";
 import {
   BarChart,
@@ -86,8 +91,46 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [currentPasswordInput, setCurrentPasswordInput] = useState("");
   const [newPasswordInput, setNewPasswordInput] = useState("");
+  const [confirmCancelPayments, setConfirmCancelPayments] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const [paymentOrder, setPaymentOrder] = useState<Order | null>(null);
+
+  // Keep paymentOrder in sync
+  useEffect(() => {
+    if (paymentOrder) {
+      const updatedOrder = orders.find(o => o.id === paymentOrder.id);
+      if (updatedOrder) {
+        // Only update if something changed to prevent infinite loops / render tearing
+        if (updatedOrder.paidAmount !== paymentOrder.paidAmount || 
+            updatedOrder.status !== paymentOrder.status || 
+            updatedOrder.payments?.length !== paymentOrder.payments?.length || 
+            JSON.stringify(updatedOrder.items) !== JSON.stringify(paymentOrder.items) ||
+            JSON.stringify(updatedOrder.romana) !== JSON.stringify(paymentOrder.romana)) {
+           setPaymentOrder(updatedOrder);
+        }
+      }
+    }
+  }, [orders, paymentOrder]);
+
+  const [pendingPayment, setPendingPayment] = useState<{ amount: number; items: { idx: number; qty: number }[]; isRomana?: boolean } | null>(null);
+  const [editingPayment, setEditingPayment] = useState<any | null>(null);
+  const [paymentToDelete, setPaymentToDelete] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"contanti" | "pos" | "bonifico">("contanti");
+  const [documentType, setDocumentType] = useState<"nessuno" | "scontrino" | "fattura">("nessuno");
+  const [whatsappReceipt, setWhatsappReceipt] = useState(false);
+  const [whatsappPrefix, setWhatsappPrefix] = useState("+39");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [invoiceData, setInvoiceData] = useState({
+    ragioneSociale: "",
+    cf: "",
+    piva: "",
+    indirizzo: "",
+    email: "",
+    telefono: "",
+    pec: "",
+    sdi: ""
+  });
   const [paymentTab, setPaymentTab] = useState<"totale" | "romana" | "items">("totale");
   const [splitCount, setSplitCount] = useState(2);
   const [selectedItemsForPayment, setSelectedItemsForPayment] = useState<
@@ -127,8 +170,10 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
   const handlePayAmount = async (
     amountToPay: number,
     itemsToMarkAsPaid: { idx: number; qty: number }[] = [],
+    isRomana: boolean = false
   ) => {
     if (!paymentOrder) return;
+    setIsProcessingPayment(true);
     
     // Virtual order (grouped) logic
     const isGrouped = paymentOrder.id.startsWith("table_");
@@ -139,25 +184,47 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
     const isFullyPaid = newPaidAmount >= paymentOrder.total - 0.01;
     const newStatus = isFullyPaid ? "paid" : paymentOrder.status;
 
+    const newPaymentRecord: any = JSON.parse(JSON.stringify({
+      id: Date.now().toString(),
+      amount: amountToPay,
+      method: paymentMethod,
+      documentType,
+      invoiceData: documentType === 'fattura' ? invoiceData : null,
+      timestamp: new Date().toISOString()
+    }));
+    
+    if (isRomana) {
+        newPaymentRecord.isRomana = true;
+    }
+
+    let romanaUpdate: any = {};
+    let updatedRomana = paymentOrder.romana;
+    if (isRomana && paymentOrder.romana) {
+        updatedRomana = { ...paymentOrder.romana, paidQuotas: paymentOrder.romana.paidQuotas + 1 };
+        romanaUpdate.romana = updatedRomana;
+    }
+
     try {
+      let newLocalItems = [...paymentOrder.items];
+      itemsToMarkAsPaid.forEach(({ idx, qty }) => {
+         if (newLocalItems[idx]) {
+            newLocalItems[idx] = {
+               ...newLocalItems[idx],
+               paidQuantity: (newLocalItems[idx].paidQuantity || 0) + qty,
+            };
+         }
+      });
+
       if (!isGrouped) {
           // Standard single order
-          let updatedItems = [...paymentOrder.items];
-          itemsToMarkAsPaid.forEach(({ idx, qty }) => {
-            if (updatedItems[idx]) {
-              updatedItems[idx] = {
-                ...updatedItems[idx],
-                paidQuantity: (updatedItems[idx].paidQuantity || 0) + qty,
-              };
-            }
-          });
-
           await updateDoc(doc(db, "orders", paymentOrder.id), {
+            ...romanaUpdate,
             paidAmount: newPaidAmount,
             status: newStatus,
             paymentGroupId: isFullyPaid ? Date.now().toString() : paymentOrder.paymentGroupId || null,
-            items: updatedItems,
+            items: newLocalItems,
             updatedAt: serverTimestamp(),
+            payments: [...(paymentOrder.payments || []), newPaymentRecord]
           });
       } else {
           // Grouped orders: split payment proportionately? 
@@ -166,19 +233,68 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
           
           if (isFullyPaid) {
               const paymentGroupId = Date.now().toString();
-              await Promise.all(orderIdsToUpdate.map(id => 
-                  updateDoc(doc(db, "orders", id), {
+              await Promise.all(orderIdsToUpdate.map(async (id, idx) => {
+                  const docSnap = await getDoc(doc(db, "orders", id));
+                  const oldPayments = docSnap.exists() ? (docSnap.data().payments || []) : [];
+                  // Only add the main receipt logic details to the first order to avoid duplicating invoices
+                  const orderPaymentRecord = idx === 0 ? newPaymentRecord : { ...newPaymentRecord, note: 'linked' };
+                  
+                  await updateDoc(doc(db, "orders", id), {
                       status: "paid",
                       paymentGroupId: paymentGroupId,
                       paidAmount: 999999, // Hack: indicate full payment
-                      updatedAt: serverTimestamp()
-                  })
-              ));
+                      updatedAt: serverTimestamp(),
+                      payments: [...oldPayments, orderPaymentRecord]
+                  });
+              }));
           } else {
+              if (itemsToMarkAsPaid.length > 0) {
+                 const updatesByOriginId: Record<string, any[]> = {};
+                 itemsToMarkAsPaid.forEach(({idx, qty}) => {
+                    const itemInGroup = paymentOrder.items[idx];
+                    const originId = itemInGroup.originOrderId;
+                    if (!originId) return;
+                    if (!updatesByOriginId[originId]) updatesByOriginId[originId] = [];
+                    updatesByOriginId[originId].push({ itemInGroup, qty });
+                 });
+
+                 await Promise.all(Object.entries(updatesByOriginId).map(async ([originId, updates]) => {
+                    const docSnap = await getDoc(doc(db, "orders", originId));
+                    if (!docSnap.exists()) return;
+                    
+                    const originalOrderData = docSnap.data();
+                    let updatedItems = [...(originalOrderData.items || [])];
+                    
+                    updates.forEach(({ itemInGroup, qty }) => {
+                       const matchIdx = updatedItems.findIndex(it => 
+                          it.productId === itemInGroup.productId && 
+                          it.name === itemInGroup.name &&
+                          it.price === itemInGroup.price
+                       );
+                       if (matchIdx >= 0) {
+                          updatedItems[matchIdx] = {
+                             ...updatedItems[matchIdx],
+                             paidQuantity: (updatedItems[matchIdx].paidQuantity || 0) + qty
+                          };
+                       }
+                    });
+                    
+                    await updateDoc(doc(db, "orders", originId), {
+                        items: updatedItems,
+                        updatedAt: serverTimestamp()
+                    });
+                 }));
+              }
+
               // Partial payment on a group: update the first order as recipient of the payment info
+              const firstOrderDoc = await getDoc(doc(db, "orders", orderIdsToUpdate[0]));
+              const firstOrderPayments = firstOrderDoc.exists() ? (firstOrderDoc.data().payments || []) : [];
+
               await updateDoc(doc(db, "orders", orderIdsToUpdate[0]), {
+                  ...romanaUpdate,
                   paidAmount: newPaidAmount,
-                  updatedAt: serverTimestamp()
+                  updatedAt: serverTimestamp(),
+                  payments: [...firstOrderPayments, newPaymentRecord]
               });
           }
       }
@@ -190,23 +306,175 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
          });
       }
 
-      if (isFullyPaid) {
-        setPaymentOrder(null);
-      } else {
-        setPaymentOrder({
-          ...paymentOrder,
-          paidAmount: newPaidAmount,
-          status: newStatus,
-          // note: items update for grouped view is complex, we just refresh from state
-        });
-        setSelectedItemsForPayment([]);
+      if (whatsappReceipt && whatsappNumber) {
+        const fullNumber = whatsappPrefix.replace(/\+/g, '') + whatsappNumber.replace(/\s+/g, '');
+        let itemsText = paymentOrder.items.map(it => `${it.quantity}x ${it.name} - %E2%82%AC${(it.price * it.quantity).toFixed(2)}`).join('%0A');
+        let text = `*RICEVUTA DI PAGAMENTO*%0A%0ATavolo: ${paymentOrder.tableNumber}%0ATotale Ordine: %E2%82%AC${paymentOrder.total.toFixed(2)}%0AImporto Pagato Ora: %E2%82%AC${amountToPay.toFixed(2)}%0AMetodo: ${paymentMethod.toUpperCase()}%0A%0A*Dettaglio Prodotti:*%0A${itemsText}%0A%0AGrazie per averci scelto!`;
+        window.open(`https://wa.me/${fullNumber}?text=${text}`, '_blank');
       }
+
+      setTimeout(() => {
+        setIsProcessingPayment(false);
+        if (isFullyPaid) {
+          setPaymentOrder(null);
+        } else {
+          setPaymentOrder({
+            ...paymentOrder,
+            paidAmount: newPaidAmount,
+            status: newStatus,
+            items: newLocalItems
+          });
+          setSelectedItemsForPayment([]);
+        }
+      }, 500);
     } catch (error) {
+      setIsProcessingPayment(false);
       handleFirestoreError(
         error,
         OperationType.UPDATE,
         `orders/${orderIdsToUpdate.join(",")}`,
       );
+    }
+  };
+
+  const handleDeletePayment = async (paymentId: string) => {
+    if (!paymentOrder) return;
+    try {
+      const isGrouped = paymentOrder.id.startsWith("table_");
+      
+      if (!isGrouped) {
+          const payments = paymentOrder.payments || [];
+          const paymentToDelete = payments.find(p => p.id === paymentId);
+          if (!paymentToDelete) return;
+
+          const updatedPayments = payments.filter(p => p.id !== paymentId);
+          const newPaidAmount = Math.max(0, (paymentOrder.paidAmount || 0) - paymentToDelete.amount);
+          
+          let romanaUpdate: any = {};
+          if (paymentToDelete.isRomana && paymentOrder.romana) {
+              romanaUpdate.romana = { 
+                  ...paymentOrder.romana, 
+                  paidQuotas: Math.max(0, paymentOrder.romana.paidQuotas - 1) 
+              };
+          }
+
+          await updateDoc(doc(db, "orders", paymentOrder.id), {
+              ...romanaUpdate,
+              payments: updatedPayments,
+              paidAmount: newPaidAmount,
+              status: paymentOrder.status === "paid" ? "delivered" : paymentOrder.status,
+              updatedAt: serverTimestamp()
+          });
+
+          // Optimistically update the UI
+          setPaymentOrder({
+              ...paymentOrder,
+              ...romanaUpdate,
+              payments: updatedPayments,
+              paidAmount: newPaidAmount,
+              status: paymentOrder.status === "paid" ? "delivered" : paymentOrder.status
+          });
+      } else {
+          const orderIdsToUpdate = (paymentOrder.allOrderIds || [paymentOrder.id]).filter(id => !id.startsWith("table_"));
+          for (const orderId of orderIdsToUpdate) {
+              const docSnap = await getDoc(doc(db, "orders", orderId));
+              if (docSnap.exists()) {
+                  const data = docSnap.data();
+                  const payments = data.payments || [];
+                  const paymentToDelete = payments.find((p: any) => p.id === paymentId);
+                  
+                  if (paymentToDelete) {
+                      const updatedPayments = payments.filter((p: any) => p.id !== paymentId);
+                      const currentPaid = data.paidAmount || 0;
+                      const newPaidAmount = currentPaid > 900000 ? 0 : Math.max(0, currentPaid - paymentToDelete.amount);
+                      
+                      let romanaUpdate: any = {};
+                      if (paymentToDelete.isRomana && data.romana) {
+                          romanaUpdate.romana = { 
+                              ...data.romana, 
+                              paidQuotas: Math.max(0, data.romana.paidQuotas - 1) 
+                          };
+                      }
+
+                      await updateDoc(doc(db, "orders", orderId), {
+                          ...romanaUpdate,
+                          payments: updatedPayments,
+                          paidAmount: newPaidAmount,
+                          status: data.status === "paid" ? "delivered" : data.status,
+                          paymentGroupId: null,
+                          updatedAt: serverTimestamp()
+                      });
+                      
+                      // Optimistically update the UI for grouped order
+                      const currentPayments = paymentOrder.payments || [];
+                      const updatedModalPayments = currentPayments.filter((p: any) => p.id !== paymentId);
+                      const currentModalPaid = paymentOrder.paidAmount || 0;
+                      const newModalPaidAmount = Math.max(0, currentModalPaid - paymentToDelete.amount);
+                      
+                      setPaymentOrder({
+                         ...paymentOrder,
+                         ...romanaUpdate,
+                         payments: updatedModalPayments,
+                         paidAmount: newModalPaidAmount,
+                         status: paymentOrder.status === "paid" ? "delivered" : paymentOrder.status
+                      });
+                      break;
+                  }
+              }
+          }
+      }
+    } catch (e) {
+      console.error("Error deleting payment", e);
+    }
+  };
+
+  const handleUpdatePayment = async (updatedPayment: any) => {
+    if (!paymentOrder) return;
+    try {
+      const isGrouped = paymentOrder.id.startsWith("table_");
+      
+      const updatePaymentsList = (payments: any[]) => 
+         payments.map(p => p.id === updatedPayment.id ? { ...p, ...updatedPayment } : p);
+
+      if (!isGrouped) {
+          const payments = paymentOrder.payments || [];
+          const updatedPayments = updatePaymentsList(payments);
+
+          await updateDoc(doc(db, "orders", paymentOrder.id), {
+              payments: updatedPayments,
+              updatedAt: serverTimestamp()
+          });
+
+      } else {
+          const orderIdsToUpdate = (paymentOrder.allOrderIds || [paymentOrder.id]).filter(id => !id.startsWith("table_"));
+          for (const orderId of orderIdsToUpdate) {
+              const docSnap = await getDoc(doc(db, "orders", orderId));
+              if (docSnap.exists()) {
+                  const data = docSnap.data();
+                  const payments = data.payments || [];
+                  const paymentToEdit = payments.find((p: any) => p.id === updatedPayment.id);
+                  if (paymentToEdit) {
+                      const updatedPayments = updatePaymentsList(payments);
+                      await updateDoc(doc(db, "orders", orderId), {
+                          payments: updatedPayments,
+                          updatedAt: serverTimestamp()
+                      });
+                      break;
+                  }
+              }
+          }
+      }
+      
+      const currentModalPayments = paymentOrder.payments || [];
+      const newModalPayments = updatePaymentsList(currentModalPayments);
+      setPaymentOrder({
+         ...paymentOrder,
+         payments: newModalPayments,
+      });
+
+      setEditingPayment(null);
+    } catch (e) {
+      console.error("Error updating payment", e);
     }
   };
 
@@ -408,6 +676,9 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
               g.paidAmount = (g.paidAmount || 0) + (o.paidAmount || 0);
               if (!g.allOrderIds) g.allOrderIds = [];
               g.allOrderIds.push(o.id);
+              if (o.romana) {
+                  g.romana = o.romana;
+              }
             }
           } else if (o.status !== "linked") {
             separateItems.push({ ...o, allOrderIds: [o.id] });
@@ -691,7 +962,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
   // Helper to split an order into distinct parts based on status
   const splitOrderByStatus = (o: Order) => {
     const splits = [];
-    if (o.status === "paid" || o.status === "cancelled" || o.status === "linked") return splits;
+    if (o.status === "paid" || o.status === "cancelled" || o.status === "linked" || o.status === "delivered") return splits;
     
     const pendingItems = o.items.filter(i => (i as any).originStatus === "pending" || (!(i as any).originStatus && o.status === "pending"));
     if (pendingItems.length > 0) splits.push({ ...o, items: pendingItems, total: pendingItems.reduce((acc, i) => acc + (i.price * i.quantity) + (i.subItems?.reduce((subAcc, si) => subAcc + si.price, 0) || 0) * i.quantity, 0), status: "pending" as OrderStatus, originalGroupedOrder: o });
@@ -713,10 +984,12 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
     let servedCount = 0;
     let paidCount = 0;
     let deletedCount = 0;
+    let deliveredCount = 0;
 
     orders.forEach(o => {
       if (o.status === "paid") { paidCount++; return; }
       if (o.status === "cancelled") { deletedCount++; return; }
+      if (o.status === "delivered") { deliveredCount++; return; }
       
       const splits = splitOrderByStatus(o);
       allCount += splits.length; // Number of "Attivi" boxes
@@ -725,7 +998,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
       if (splits.some(s => s.status === "served")) servedCount++;
     });
 
-    return { all: allCount, pending: pendingCount, toDeliver: preparingCount, served: servedCount, paid: paidCount, deleted: deletedCount };
+    return { all: allCount, pending: pendingCount, toDeliver: preparingCount, served: servedCount, paid: paidCount, deleted: deletedCount, delivered: deliveredCount };
   }, [orders]);
 
   const filteredOrders = useMemo(() => {
@@ -1089,7 +1362,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
       </AnimatePresence>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8">
-        <div className={`sticky top-0 z-[90] bg-brand-paper/95 backdrop-blur-sm pt-4 sm:pt-6 lg:pt-8 transition-all duration-300 ${isScrolled ? "pb-3 sm:pb-4 border-b border-brand-black/5 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 shadow-sm mb-5" : "pb-8"}`}>
+        <div className={`sticky top-0 z-40 bg-brand-paper/95 backdrop-blur-sm pt-4 sm:pt-6 lg:pt-8 transition-all duration-300 ${isScrolled ? "pb-3 sm:pb-4 border-b border-brand-black/5 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 shadow-sm mb-5" : "pb-8"}`}>
           <header className={`flex flex-wrap items-center justify-between gap-4 transition-all duration-300 ${isScrolled ? "scale-[0.96] origin-left" : ""}`}>
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 flex-1">
           <button 
@@ -1816,7 +2089,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
               { id: "all", label: "🔥 Attivi", count: categoryCounts.all },
               { id: "pending", label: "🕐 In attesa", count: categoryCounts.pending },
               { id: "toDeliver", label: "🏃 In prep.", count: categoryCounts.toDeliver },
-              { id: "served", label: "✅ Consegnati", count: categoryCounts.served },
+              { id: "served", label: "✅ Al Tavolo", count: categoryCounts.served },
               { id: "paid", label: "💰 Pagati", count: categoryCounts.paid },
               { id: "deleted", label: "🗑️ Eliminati", count: categoryCounts.deleted },
             ].map((s) => (
@@ -1925,7 +2198,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   {filteredOrders.filter(o => o.status !== "linked").map(order => {
                       const isPending = order.items.some(i => (i as any).originStatus === 'pending' || (!(i as any).originStatus && order.status === 'pending'));
                       const isPreparing = order.items.some(i => (i as any).originStatus === 'preparing' || (!(i as any).originStatus && order.status === 'preparing'));
-                      const statusMsg = order.status === "cancelled" ? "ANNULLATO" : order.status === "paid" ? "PAGATO" : isPending ? "IN ATTESA" : isPreparing ? "IN PREP." : "SERVITO";
+                      const statusMsg = order.status === "cancelled" ? "ANNULLATO" : order.status === "paid" ? "PAGATO" : order.status === "delivered" ? "CONSEGNATO" : isPending ? "IN ATTESA" : isPreparing ? "IN PREP." : "SERVITO";
                       
                       return (
                       <div key={`${order.id}-${order.status}`} className="bg-brand-paper p-6 rounded-3xl shadow-sm border border-brand-black/5 flex flex-col items-center justify-center text-center hover:border-brand-gold transition-all hover:-translate-y-1 cursor-pointer" onClick={() => setViewingTableOrder(order)}>
@@ -2088,19 +2361,23 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                         {order.id.slice(-6).toUpperCase()}
                       </p>
                     </div>
-                    <div
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
+                    <select
+                      value={order.status}
+                      onChange={(e) => updateStatus((order as any).originalGroupedOrder?.id || order.id, e.target.value as OrderStatus, order.status)}
+                      className={`appearance-none outline-none flex items-center justify-center gap-2 px-6 py-2 rounded-full border border-b-2 font-black uppercase tracking-widest text-[10px] cursor-pointer shadow-sm hover:opacity-80 transition-opacity ${
                         order.status === "pending" || order.status === "preparing"
-                          ? "bg-amber-50 border-amber-200 text-amber-700"
+                          ? "bg-amber-50 border-amber-300 text-amber-700"
                           : order.status === "served"
-                              ? "bg-green-50 border-green-200 text-green-700"
-                              : "bg-gray-50 border-gray-200 text-gray-700"
+                              ? "bg-green-50 border-green-300 text-green-700"
+                              : "bg-gray-50 border-gray-300 text-gray-700"
                       }`}
                     >
-                      <span className="text-[10px] font-black uppercase tracking-widest leading-none">
-                        {order.status === "pending" || order.status === "preparing" ? t("toDeliver", lang) : order.status === "served" ? t("delivered", lang) : order.status}
-                      </span>
-                    </div>
+                        <option value="pending">IN ATTESA</option>
+                        <option value="preparing">IN PREP.</option>
+                        <option value="served">DELIVERED</option>
+                        <option value="paid">PAGATO</option>
+                        <option value="cancelled">ANNULLATO</option>
+                    </select>
                   </div>
 
                   <ul className="space-y-4 mb-4 border-t border-b border-brand-gold/10 py-6 flex-grow">
@@ -2143,7 +2420,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                               </div>
                             )}
                             <span className="text-[10px] opacity-40 font-medium block mt-1">
-                              cad. € {item.price.toFixed(2)}
+                              {getMenu().find(p => p.id === item.productId)?.isPricePerKg ? 'al kg ' : 'cad. '}€ {item.price.toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -2216,6 +2493,22 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                            className="w-full bg-brand-black text-brand-gold py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all border border-brand-gold/20"
                          >
                            <Receipt size={20} /> GESTISCI PAGAMENTO
+                         </button>
+                       )}
+                       {order.status === "paid" && (
+                         <button
+                           onClick={() => updateStatus(order.id, "delivered", "paid")}
+                           className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
+                         >
+                           <Truck size={20} /> SEGNALA COME CONSEGNATO
+                         </button>
+                       )}
+                       {order.status === "delivered" && (
+                         <button
+                           onClick={() => updateStatus(order.id, "paid", "delivered")}
+                           className="w-full bg-brand-gold text-brand-black py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
+                         >
+                           <Receipt size={20} /> SEGNALA COME PAGATO
                          </button>
                        )}
                     </div>
@@ -2403,13 +2696,13 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                 </p>
                 <button
                   onClick={() =>
-                    handlePayAmount(
-                      Math.max(
+                    setPendingPayment({
+                      amount: Math.max(
                         0,
                         paymentOrder.total - (paymentOrder.paidAmount || 0),
                       ),
-                      [],
-                    )
+                      items: [],
+                    })
                   }
                   className="w-full bg-green-600 text-white py-5 rounded-[1.5rem] font-black text-lg uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl hover:bg-green-500 active:scale-95 transition-all"
                 >
@@ -2420,54 +2713,119 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
 
             {paymentTab === "romana" && (
               <div className="bg-brand-paper p-8 rounded-3xl border border-brand-black/5">
-                <label className="block text-center text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-4">
-                  Dividi l'importo rimanente per
-                </label>
-                <div className="flex items-center justify-center gap-6 mb-8">
-                  <button
-                    onClick={() => setSplitCount(Math.max(2, splitCount - 1))}
-                    className="w-16 h-16 bg-white rounded-2xl shadow-sm text-brand-black font-black flex items-center justify-center text-2xl hover:scale-105 active:scale-95 transition-all outline-none"
-                  >
-                    -
-                  </button>
-                  <span className="font-serif italic text-4xl sm:text-6xl text-brand-black">
-                    {splitCount}
-                  </span>
-                  <button
-                    onClick={() => setSplitCount(splitCount + 1)}
-                    className="w-16 h-16 bg-white rounded-2xl shadow-sm text-brand-black font-black flex items-center justify-center text-2xl hover:scale-105 active:scale-95 transition-all outline-none"
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="text-center mb-8">
-                  <p className="text-sm font-bold text-brand-black mb-2 opacity-60">
-                    Quota sulla parte rimanente
-                  </p>
-                  <p className="text-3xl sm:text-4xl font-black font-mono">
-                    €{" "}
-                    {(
-                      Math.max(
-                        0,
-                        paymentOrder.total - (paymentOrder.paidAmount || 0),
-                      ) / splitCount
-                    ).toFixed(2)}
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    const quota =
-                      Math.max(
-                        0,
-                        paymentOrder.total - (paymentOrder.paidAmount || 0),
-                      ) / splitCount;
-                    handlePayAmount(quota, []);
-                    setSplitCount(Math.max(1, splitCount - 1));
-                  }}
-                  className="w-full bg-brand-gold text-brand-black py-5 rounded-[1.5rem] font-black text-lg uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl hover:bg-yellow-400 active:scale-95 transition-all border border-brand-gold-dark"
-                >
-                  <Coins size={24} /> Incassa 1 Quota
-                </button>
+                {paymentOrder.romana ? (
+                  <div className="text-center">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="bg-brand-gold text-brand-black px-4 py-2 rounded-full font-black text-xs uppercase tracking-widest mx-auto flex items-center gap-2">
+                         <Split size={14} /> Romana Bloccata
+                      </div>
+                    </div>
+                    <p className="text-sm font-bold text-brand-black mb-2 opacity-60">
+                      Valore della quota
+                    </p>
+                    <p className="text-4xl font-black font-mono mb-4 text-brand-gold-dark">
+                      € {paymentOrder.romana.quotaValue.toFixed(2)}
+                    </p>
+                    <div className="bg-white rounded-2xl p-4 mb-8 shadow-sm">
+                       <p className="text-sm font-bold uppercase tracking-widest text-brand-black/50 mb-2">Stato Quote</p>
+                       <p className="font-mono text-2xl font-black">
+                         {paymentOrder.romana.paidQuotas} <span className="opacity-40">/ {paymentOrder.romana.totalQuotas} pagate</span>
+                       </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                      <button
+                        onClick={() => setPendingPayment({ amount: paymentOrder.romana!.quotaValue, items: [], isRomana: true })}
+                        disabled={paymentOrder.romana.paidQuotas >= paymentOrder.romana.totalQuotas}
+                        className="w-full bg-brand-gold text-brand-black py-4 rounded-[1.5rem] font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl hover:bg-yellow-400 active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none"
+                      >
+                        <Coins size={20} /> Incassa Quota ({paymentOrder.romana.totalQuotas - paymentOrder.romana.paidQuotas} Rimanenti)
+                      </button>
+                      <button
+                        onClick={async () => {
+                           const isGrouped = paymentOrder.id.startsWith("table_");
+                           if (!isGrouped) {
+                              await updateDoc(doc(db, "orders", paymentOrder.id), { romana: deleteField() });
+                           } else {
+                              const orderIdsToUpdate = (paymentOrder.allOrderIds || [paymentOrder.id]).filter(id => !id.startsWith("table_"));
+                              await Promise.all(orderIdsToUpdate.map(async (id) => {
+                                 await updateDoc(doc(db, "orders", id), { romana: deleteField() });
+                              }));
+                           }
+                           setPaymentOrder({ ...paymentOrder, romana: undefined });
+                        }}
+                        className="w-full bg-red-50 text-red-600 border border-red-200 py-3 rounded-[1.5rem] font-bold text-xs uppercase tracking-widest hover:bg-red-100 transition-all"
+                      >
+                        Sblocca Romana
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <label className="block text-center text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-4">
+                      Dividi l'importo rimanente per
+                    </label>
+                    <div className="flex items-center justify-center gap-6 mb-8">
+                      <button
+                        onClick={() => setSplitCount(Math.max(2, splitCount - 1))}
+                        className="w-16 h-16 bg-white rounded-2xl shadow-sm text-brand-black font-black flex items-center justify-center text-2xl hover:scale-105 active:scale-95 transition-all outline-none"
+                      >
+                        -
+                      </button>
+                      <span className="font-serif italic text-4xl sm:text-6xl text-brand-black">
+                        {splitCount}
+                      </span>
+                      <button
+                        onClick={() => setSplitCount(splitCount + 1)}
+                        className="w-16 h-16 bg-white rounded-2xl shadow-sm text-brand-black font-black flex items-center justify-center text-2xl hover:scale-105 active:scale-95 transition-all outline-none"
+                      >
+                        +
+                      </button>
+                    </div>
+                    
+                    {(() => {
+                      const remainingAmount = Math.max(0, paymentOrder.total - (paymentOrder.paidAmount || 0));
+                      const valQuota = remainingAmount / splitCount;
+
+                      return (
+                        <div className="text-center mb-4">
+                          <p className="text-sm font-bold text-brand-black mb-2 opacity-60">
+                            Valore della quota
+                          </p>
+                          <p className="text-3xl sm:text-4xl font-black font-mono">
+                            € {valQuota.toFixed(2)}
+                          </p>
+
+                          <div className="mt-8">
+                            <button
+                               onClick={async () => {
+                                  const baseRomana = {
+                                     totalQuotas: splitCount,
+                                     paidQuotas: 0,
+                                     quotaValue: valQuota
+                                  };
+                                  const isGrouped = paymentOrder.id.startsWith("table_");
+                                  if (!isGrouped) {
+                                     await updateDoc(doc(db, "orders", paymentOrder.id), { romana: baseRomana });
+                                  } else {
+                                     const orderIdsToUpdate = (paymentOrder.allOrderIds || [paymentOrder.id]).filter(id => !id.startsWith("table_"));
+                                     await Promise.all(orderIdsToUpdate.map(async (id) => {
+                                        await updateDoc(doc(db, "orders", id), { romana: baseRomana });
+                                     }));
+                                  }
+                                  setPaymentOrder({ ...paymentOrder, romana: baseRomana });
+                               }}
+                               disabled={remainingAmount <= 0}
+                               className="w-full bg-brand-black text-brand-gold py-5 rounded-[1.5rem] font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none"
+                            >
+                               <LockIcon size={20} /> Blocca Romana e Inizia
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </>
+                )}
               </div>
             )}
 
@@ -2491,6 +2849,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                         <div className="min-w-0 flex-1 pr-2">
                           <p className="font-bold text-brand-black leading-tight text-base sm:text-lg break-words">
                             {item.name}
+                            {item.variant && <span className="block text-sm opacity-60 font-medium">({item.variant})</span>}
                           </p>
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mt-1">
                             <span className="text-xs font-semibold opacity-50">
@@ -2503,7 +2862,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                       <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-brand-black/5 mt-2 sm:mt-0">
                         <span className="font-mono font-black text-brand-black whitespace-nowrap sm:mr-4">
                            € {item.price.toFixed(2)}{" "}
-                           <span className="opacity-40 text-[10px] uppercase">cad.</span>
+                           <span className="opacity-40 text-[10px] uppercase">{getMenu().find(p => p.id === item.productId)?.isPricePerKg ? 'al kg' : 'cad.'}</span>
                         </span>
                         {availQty > 0 ? (
                           <div className="flex items-center gap-2 sm:gap-3 border border-brand-black/10 rounded-full p-1 bg-brand-paper shrink-0">
@@ -2588,7 +2947,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                           acc + paymentOrder.items[sel.idx].price * sel.qty,
                         0,
                       );
-                      handlePayAmount(amount, selectedItemsForPayment);
+                      setPendingPayment({ amount, items: selectedItemsForPayment });
                     }}
                     className={`w-full sm:w-auto justify-center px-8 py-5 sm:py-5 sm:px-8 rounded-[1.5rem] font-black text-sm uppercase tracking-widest flex items-center gap-3 transition-all ${selectedItemsForPayment.length > 0 ? "bg-brand-black text-brand-gold shadow-xl hover:scale-105 active:scale-95" : "bg-brand-black/10 text-brand-black/40 cursor-not-allowed"}`}
                   >
@@ -2603,17 +2962,177 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
               <div className="mt-6 flex justify-end">
                 <button
                   onClick={() =>
-                    handlePayAmount(
-                      Math.max(
+                    setPendingPayment({
+                      amount: Math.max(
                         0,
                         paymentOrder.total - (paymentOrder.paidAmount || 0),
                       ),
-                      [],
-                    )
+                      items: [],
+                    })
                   }
                   className="w-full sm:w-auto justify-center bg-green-600 text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 shadow-xl hover:bg-green-500 active:scale-95 transition-all text-center"
                 >
                   <CheckCircle2 size={18} /> SALDA INTERO RIMANENTE
+                </button>
+              </div>
+            )}
+
+            {paymentOrder.payments && paymentOrder.payments.length > 0 && (
+              <div className="mt-12 pt-8 border-t border-brand-black/10">
+                <h4 className="text-xs font-black uppercase tracking-widest text-brand-black/50 mb-6 flex items-center gap-2">
+                  <ClipboardList size={16} /> Storico Pagamenti
+                </h4>
+                <div className="space-y-3">
+                  {paymentOrder.payments.filter(p => !p.note || p.note !== 'linked').map((payment, idx) => (
+                    <div key={idx} className="bg-brand-paper p-4 rounded-2xl flex flex-col justify-center text-sm border border-brand-black/5 group relative gap-3">
+                      <div className="flex justify-between items-center w-full">
+                        <div>
+                          <p className="font-bold text-brand-black">€ {payment.amount.toFixed(2)}</p>
+                          <p className="text-[10px] font-medium text-brand-black/50 mt-1 uppercase">
+                            {new Date(payment.timestamp).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })}
+                          </p>
+                        </div>
+                        <div className="text-right flex items-center gap-2">
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="inline-block px-2 py-1 bg-brand-black/5 rounded font-black text-[10px] uppercase">
+                              {payment.method === 'pos' ? 'POS' : payment.method === 'bonifico' ? 'Bonifico' : 'Contanti'}
+                            </span>
+                            {payment.documentType && payment.documentType !== 'nessuno' && (
+                              <span className="inline-block px-2 py-1 bg-brand-gold/20 text-brand-black rounded font-black text-[10px] uppercase">
+                                {payment.documentType}
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => {
+                               setEditingPayment(payment);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-2 bg-brand-black/5 text-brand-black rounded-full hover:bg-brand-black/10 transition-all shrink-0"
+                            title="Modifica Pagamento"
+                          >
+                             <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={async () => {
+                               try {
+                                   const blob = await generateReceiptPdfBlob(paymentOrder, payment.amount, payment.method);
+                                   const file = new File([blob], `ricevuta_${paymentOrder.tableNumber}_${Date.now()}.pdf`, { type: 'application/pdf' });
+                                   
+                                   if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                                       await navigator.share({
+                                           files: [file],
+                                           title: 'Ricevuta di Pagamento',
+                                           text: 'Ecco la ricevuta del tuo pagamento.'
+                                       });
+                                   } else {
+                                       const url = URL.createObjectURL(blob);
+                                       const a = document.createElement('a');
+                                       a.href = url;
+                                       a.download = file.name;
+                                       document.body.appendChild(a);
+                                       a.click();
+                                       document.body.removeChild(a);
+                                       URL.revokeObjectURL(url);
+                                   }
+                               } catch (e) {
+                                   console.error(e);
+                                   alert("Errore durante la generazione della ricevuta.");
+                               }
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-2 bg-brand-gold/10 text-brand-gold-dark rounded-full hover:bg-brand-gold/20 transition-all shrink-0"
+                            title="Condividi Ricevuta"
+                          >
+                             <Share2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => {
+                               setPaymentToDelete(payment.id);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-2 bg-red-50 text-red-500 rounded-full hover:bg-red-100 transition-all shrink-0"
+                            title="Elimina Pagamento"
+                          >
+                             <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {paymentToDelete === payment.id && (
+                        <div className="absolute inset-0 z-10 bg-white/95 backdrop-blur-sm rounded-[1rem] flex flex-col justify-center items-center gap-3 p-4 shadow-lg border-2 border-red-500/20">
+                          <p className="text-sm font-black uppercase tracking-widest text-red-500 flex items-center gap-2">
+                            <XCircle size={16} /> Elimina questo pagamento?
+                          </p>
+                          <div className="flex gap-3 w-full max-w-[250px]">
+                             <button
+                               onClick={() => {
+                                 handleDeletePayment(payment.id);
+                                 setPaymentToDelete(null);
+                               }}
+                               className="flex-1 py-2 bg-red-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md hover:bg-red-600 active:scale-95 transition-all"
+                             >
+                               Conferma
+                             </button>
+                             <button
+                               onClick={() => setPaymentToDelete(null)}
+                               className="flex-1 py-2 bg-brand-black/5 text-brand-black rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-black/10 active:scale-95 transition-all"
+                             >
+                               Annulla
+                             </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {payment.documentType === 'fattura' && payment.invoiceData && (
+                        <div className="mt-2 pt-3 border-t border-brand-black/10 grid grid-cols-2 gap-2 text-xs">
+                           <div><span className="font-bold opacity-60">Ragione Sociale:</span> {payment.invoiceData.ragioneSociale || '-'}</div>
+                           <div><span className="font-bold opacity-60">P.IVA:</span> {payment.invoiceData.piva || '-'}</div>
+                           <div><span className="font-bold opacity-60">C.F.:</span> {payment.invoiceData.cf || '-'}</div>
+                           <div><span className="font-bold opacity-60">SDI:</span> {payment.invoiceData.sdi || '-'}</div>
+                           <div className="col-span-2"><span className="font-bold opacity-60">PEC:</span> {payment.invoiceData.pec || '-'}</div>
+                           <div className="col-span-2"><span className="font-bold opacity-60">Indirizzo:</span> {payment.invoiceData.indirizzo || '-'}</div>
+                           <div><span className="font-bold opacity-60">Email:</span> {payment.invoiceData.email || '-'}</div>
+                           <div><span className="font-bold opacity-60">Telefono:</span> {payment.invoiceData.telefono || '-'}</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                <button
+                   onClick={async () => {
+                      if (!confirmCancelPayments) {
+                         setConfirmCancelPayments(true);
+                         setTimeout(() => setConfirmCancelPayments(false), 3000);
+                         return;
+                      }
+                      
+                      try {
+                        const isGrouped = paymentOrder.id.startsWith("table_");
+                        const orderIdsToUpdate = (paymentOrder.allOrderIds || [paymentOrder.id]).filter(id => !id.startsWith("table_"));
+                        
+                        for (const id of orderIdsToUpdate) {
+                          const docSnap = await getDoc(doc(db, "orders", id));
+                          if (docSnap.exists()) {
+                             const data = docSnap.data();
+                             const resetItems = (data.items || []).map((i: any) => ({ ...i, paidQuantity: 0 }));
+                             await updateDoc(doc(db, "orders", id), {
+                                paidAmount: 0,
+                                status: data.status === "paid" ? "delivered" : data.status,
+                                paymentGroupId: null,
+                                payments: [],
+                                items: resetItems,
+                                updatedAt: serverTimestamp()
+                             });
+                          }
+                        }
+                        setPaymentOrder(null);
+                        setConfirmCancelPayments(false);
+                      } catch(e) {
+                        console.error(e);
+                      }
+                   }}
+                   className={`w-full mt-6 py-4 border-2 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2 ${confirmCancelPayments ? "bg-red-500 border-red-500 text-white" : "border-red-500/20 text-red-500 hover:bg-red-50"}`}
+                >
+                   <RefreshCw size={14} /> {confirmCancelPayments ? "CONFERMA ANNULLAMENTO INCASSI" : "Annulla tutti i pagamenti"}
                 </button>
               </div>
             )}
@@ -2825,6 +3344,353 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                className="w-full bg-amber-900 text-amber-100 py-6 rounded-2xl font-black text-lg uppercase tracking-widest active:scale-95 transition-all shadow-xl"
             >
                Chiudi
+            </button>
+          </div>
+        </div>
+      )}
+
+      {pendingPayment && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-brand-paper w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[2rem] p-6 sm:p-8 shadow-2xl relative border-4 border-brand-black/5">
+            <button
+              onClick={() => setPendingPayment(null)}
+              className="absolute top-4 right-4 p-3 bg-brand-black/5 hover:bg-brand-black/10 rounded-full transition-colors"
+            >
+              <X size={20} className="opacity-60" />
+            </button>
+            <h2 className="text-xl font-black uppercase tracking-widest mb-6 border-b border-brand-black/10 pb-4 text-brand-black">Dettagli Incasso</h2>
+            
+            <p className="text-center font-mono text-4xl font-black mb-8 text-brand-black">
+              € {pendingPayment.amount.toFixed(2)}
+            </p>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest opacity-50 mb-3">Metodo di Pagamento</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'contanti', label: 'Contanti' },
+                    { id: 'pos', label: 'POS' },
+                    { id: 'bonifico', label: 'Bonifico' }
+                  ].map(method => (
+                    <button
+                      key={method.id}
+                      onClick={() => setPaymentMethod(method.id as any)}
+                      className={`py-3 px-2 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all ${paymentMethod === method.id ? "bg-brand-black text-brand-gold shadow-md" : "bg-white text-brand-black/60 border border-brand-black/10"}`}
+                    >
+                      {method.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest opacity-50 mb-3">Tipo Documento</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'nessuno', label: 'Nessuno' },
+                    { id: 'scontrino', label: 'Scontrino' },
+                    { id: 'fattura', label: 'Fattura' }
+                  ].map(docType => (
+                    <button
+                      key={docType.id}
+                      onClick={() => setDocumentType(docType.id as any)}
+                      className={`py-3 px-2 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all ${documentType === docType.id ? "bg-brand-black text-brand-gold shadow-md" : "bg-white text-brand-black/60 border border-brand-black/10"}`}
+                    >
+                      {docType.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {documentType === 'fattura' && (
+                <div className="bg-white p-4 rounded-2xl border border-brand-black/10 space-y-3 mt-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Dati Fatturazione</p>
+                  <input
+                    type="text"
+                    placeholder="Ragione Sociale o Nome Cognome"
+                    value={invoiceData.ragioneSociale}
+                    onChange={(e) => setInvoiceData({...invoiceData, ragioneSociale: e.target.value})}
+                    className="w-full bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Codice Fiscale"
+                      value={invoiceData.cf}
+                      onChange={(e) => setInvoiceData({...invoiceData, cf: e.target.value})}
+                      className="w-full bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Partita IVA"
+                      value={invoiceData.piva}
+                      onChange={(e) => setInvoiceData({...invoiceData, piva: e.target.value})}
+                      className="w-full bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Indirizzo Completo"
+                    value={invoiceData.indirizzo}
+                    onChange={(e) => setInvoiceData({...invoiceData, indirizzo: e.target.value})}
+                    className="w-full bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={invoiceData.email}
+                      onChange={(e) => setInvoiceData({...invoiceData, email: e.target.value})}
+                      className="w-full bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
+                    />
+                    <input
+                      type="email"
+                      placeholder="PEC"
+                      value={invoiceData.pec}
+                      onChange={(e) => setInvoiceData({...invoiceData, pec: e.target.value})}
+                      className="w-full bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Codice SDI"
+                      maxLength={7}
+                      value={invoiceData.sdi}
+                      onChange={(e) => setInvoiceData({...invoiceData, sdi: e.target.value})}
+                      className="w-full bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none uppercase transition-all"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Telefono"
+                      value={invoiceData.telefono}
+                      onChange={(e) => setInvoiceData({...invoiceData, telefono: e.target.value})}
+                      className="w-full bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-brand-black/10">
+               <label className="flex items-center gap-3 cursor-pointer">
+                 <input
+                   type="checkbox"
+                   checked={whatsappReceipt}
+                   onChange={(e) => setWhatsappReceipt(e.target.checked)}
+                   className="w-5 h-5 accent-brand-black"
+                 />
+                 <span className="font-bold text-sm tracking-wide text-brand-black">Invia ricevuta tramite WhatsApp</span>
+               </label>
+               {whatsappReceipt && (
+                 <div className="mt-4 flex gap-2">
+                   <input
+                     type="text"
+                     value={whatsappPrefix}
+                     onChange={(e) => setWhatsappPrefix(e.target.value)}
+                     className="w-20 bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium border border-brand-black/10 focus:border-brand-gold outline-none transition-all text-center"
+                     placeholder="+39"
+                   />
+                   <input
+                     type="tel"
+                     value={whatsappNumber}
+                     onChange={(e) => setWhatsappNumber(e.target.value)}
+                     placeholder="Numero di telefono"
+                     className="flex-1 bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
+                   />
+                 </div>
+               )}
+            </div>
+
+            <button
+               onClick={() => {
+                 handlePayAmount(pendingPayment.amount, pendingPayment.items).then(() => {
+                   setPendingPayment(null);
+                 });
+               }}
+               disabled={isProcessingPayment}
+               className={`w-full mt-8 bg-brand-gold text-brand-black py-5 rounded-[1.5rem] font-black text-sm sm:text-base uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2 ${isProcessingPayment ? "opacity-70 cursor-not-allowed" : "hover:bg-yellow-400 active:scale-95"}`}
+            >
+               {isProcessingPayment ? (
+                 <>
+                   <RefreshCw className="animate-spin" size={24} /> ELABORAZIONE...
+                 </>
+               ) : (
+                 <>
+                   <CheckCircle2 size={24} /> Conferma Incasso
+                 </>
+               )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {editingPayment && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-brand-paper w-full max-w-lg overflow-y-auto rounded-[2rem] p-6 sm:p-8 shadow-2xl relative border-4 border-brand-black/5">
+            <button
+              onClick={() => setEditingPayment(null)}
+              className="absolute top-4 right-4 p-3 bg-brand-black/5 hover:bg-brand-black/10 rounded-full transition-colors"
+            >
+              <X size={20} className="opacity-60" />
+            </button>
+            <h2 className="text-xl font-black uppercase tracking-widest mb-6 border-b border-brand-black/10 pb-4 text-brand-black">Modifica Pagamento</h2>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-3">
+                  Metodo di Pagamento
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setEditingPayment({ ...editingPayment, method: "contanti" })}
+                    className={`flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border ${editingPayment.method === "contanti" ? "bg-brand-black text-brand-gold border-brand-black" : "bg-white text-brand-black/60 border-brand-black/10 hover:border-brand-gold"}`}
+                  >
+                    <Coins size={24} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Contanti</span>
+                  </button>
+                  <button
+                    onClick={() => setEditingPayment({ ...editingPayment, method: "pos" })}
+                    className={`flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border ${editingPayment.method === "pos" ? "bg-brand-black text-brand-gold border-brand-black" : "bg-white text-brand-black/60 border-brand-black/10 hover:border-brand-gold"}`}
+                  >
+                    <CreditCard size={24} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">POS</span>
+                  </button>
+                  <button
+                     onClick={() => setEditingPayment({ ...editingPayment, method: "bonifico" })}
+                     className={`flex-1 flex flex-col items-center gap-2 py-4 rounded-xl border ${editingPayment.method === "bonifico" ? "bg-brand-black text-brand-gold border-brand-black" : "bg-white text-brand-black/60 border-brand-black/10 hover:border-brand-gold"}`}
+                   >
+                     <Landmark size={24} />
+                     <span className="text-[10px] font-black uppercase tracking-widest">Bonifico</span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-3">
+                  Documento Fiscale
+                </label>
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => {
+                        const newDoc = "nessuno";
+                        setEditingPayment({
+                            ...editingPayment, 
+                            documentType: newDoc,
+                            invoiceData: newDoc === "fattura" ? (editingPayment.invoiceData || invoiceData) : null
+                        });
+                    }}
+                    className={`flex-1 py-3 px-2 text-[10px] text-center rounded-xl border font-black uppercase tracking-widest transition-all ${editingPayment.documentType === "nessuno" || !editingPayment.documentType ? "bg-brand-black text-brand-gold border-brand-black shadow-md" : "bg-white text-brand-black/60 hover:bg-brand-black/5 border-brand-black/10"}`}
+                  >
+                    Nessuno
+                  </button>
+                  <button
+                    onClick={() => {
+                        const newDoc = "scontrino";
+                        setEditingPayment({
+                            ...editingPayment, 
+                            documentType: newDoc,
+                            invoiceData: newDoc === "fattura" ? (editingPayment.invoiceData || invoiceData) : null
+                        });
+                    }}
+                    className={`flex-1 py-3 px-2 text-[10px] text-center rounded-xl border font-black uppercase tracking-widest transition-all ${editingPayment.documentType === "scontrino" ? "bg-brand-black text-brand-gold border-brand-black shadow-md" : "bg-white text-brand-black/60 hover:bg-brand-black/5 border-brand-black/10"}`}
+                  >
+                    Scontrino
+                  </button>
+                  <button
+                    onClick={() => {
+                        const newDoc = "fattura";
+                        setEditingPayment({
+                            ...editingPayment, 
+                            documentType: newDoc,
+                            invoiceData: newDoc === "fattura" ? (editingPayment.invoiceData || invoiceData) : null
+                        });
+                    }}
+                    className={`flex-1 py-3 px-2 text-[10px] text-center rounded-xl border font-black uppercase tracking-widest transition-all ${editingPayment.documentType === "fattura" ? "bg-brand-black text-brand-gold border-brand-black shadow-md" : "bg-white text-brand-black/60 hover:bg-brand-black/5 border-brand-black/10"}`}
+                  >
+                    Fattura
+                  </button>
+                </div>
+                {editingPayment.documentType === "fattura" && (
+                    <div className="space-y-3 bg-brand-black/5 p-4 rounded-xl mt-4">
+                      <h4 className="font-bold text-xs uppercase tracking-widest text-brand-black/60 mb-2 border-b border-brand-black/10 pb-2">Dati Fatturazione</h4>
+                      <input 
+                         type="text" 
+                         placeholder="Ragione Sociale" 
+                         value={editingPayment.invoiceData?.ragioneSociale || ""}
+                         onChange={(e) => setEditingPayment({...editingPayment, invoiceData: {...editingPayment.invoiceData, ragioneSociale: e.target.value}})}
+                         className="w-full text-sm p-3 rounded-lg border border-brand-black/10 focus:border-brand-gold outline-none bg-white"
+                      />
+                      <div className="flex gap-2">
+                        <input 
+                           type="text" 
+                           placeholder="P.IVA" 
+                           value={editingPayment.invoiceData?.piva || ""}
+                           onChange={(e) => setEditingPayment({...editingPayment, invoiceData: {...editingPayment.invoiceData, piva: e.target.value}})}
+                           className="w-1/2 text-sm p-3 rounded-lg border border-brand-black/10 focus:border-brand-gold outline-none bg-white font-mono"
+                        />
+                        <input 
+                           type="text" 
+                           placeholder="C.F." 
+                           value={editingPayment.invoiceData?.cf || ""}
+                           onChange={(e) => setEditingPayment({...editingPayment, invoiceData: {...editingPayment.invoiceData, cf: e.target.value}})}
+                           className="w-1/2 text-sm p-3 rounded-lg border border-brand-black/10 focus:border-brand-gold outline-none bg-white font-mono"
+                        />
+                      </div>
+                      <input 
+                         type="text" 
+                         placeholder="Indirizzo Completo" 
+                         value={editingPayment.invoiceData?.indirizzo || ""}
+                         onChange={(e) => setEditingPayment({...editingPayment, invoiceData: {...editingPayment.invoiceData, indirizzo: e.target.value}})}
+                         className="w-full text-sm p-3 rounded-lg border border-brand-black/10 focus:border-brand-gold outline-none bg-white font-mono"
+                      />
+                      <div className="flex gap-2">
+                        <input 
+                           type="email" 
+                           placeholder="Email" 
+                           value={editingPayment.invoiceData?.email || ""}
+                           onChange={(e) => setEditingPayment({...editingPayment, invoiceData: {...editingPayment.invoiceData, email: e.target.value}})}
+                           className="w-1/2 text-sm p-3 rounded-lg border border-brand-black/10 focus:border-brand-gold outline-none bg-white font-mono"
+                        />
+                        <input 
+                           type="tel" 
+                           placeholder="Telefono" 
+                           value={editingPayment.invoiceData?.telefono || ""}
+                           onChange={(e) => setEditingPayment({...editingPayment, invoiceData: {...editingPayment.invoiceData, telefono: e.target.value}})}
+                           className="w-1/2 text-sm p-3 rounded-lg border border-brand-black/10 focus:border-brand-gold outline-none bg-white font-mono"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <input 
+                           type="text" 
+                           placeholder="PEC" 
+                           value={editingPayment.invoiceData?.pec || ""}
+                           onChange={(e) => setEditingPayment({...editingPayment, invoiceData: {...editingPayment.invoiceData, pec: e.target.value}})}
+                           className="w-1/2 text-sm p-3 rounded-lg border border-brand-black/10 focus:border-brand-gold outline-none bg-white font-mono"
+                        />
+                        <input 
+                           type="text" 
+                           maxLength={7}
+                           placeholder="Codice SDI" 
+                           value={editingPayment.invoiceData?.sdi || ""}
+                           onChange={(e) => setEditingPayment({...editingPayment, invoiceData: {...editingPayment.invoiceData, sdi: e.target.value}})}
+                           className="w-1/2 text-sm p-3 rounded-lg border border-brand-black/10 focus:border-brand-gold outline-none bg-white uppercase font-mono"
+                        />
+                      </div>
+                    </div>
+                )}
+              </div>
+
+            </div>
+
+            <button
+               onClick={() => {
+                 handleUpdatePayment(editingPayment);
+               }}
+               className="w-full mt-8 bg-brand-black text-brand-gold py-5 rounded-[1.5rem] font-black text-sm sm:text-base uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-2 hover:scale-105 active:scale-95"
+            >
+               <CheckCircle2 size={24} /> Salva Modifiche
             </button>
           </div>
         </div>

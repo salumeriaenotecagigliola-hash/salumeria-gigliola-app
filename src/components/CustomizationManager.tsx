@@ -51,7 +51,7 @@ export default function CustomizationManager() {
     const extraData = {
       name: name.trim(),
       category: category,
-      price: parseFloat(price.replace(',', '.')) || 0,
+      price: parseFloat(price) || 0,
       targets
     };
 
@@ -80,10 +80,10 @@ export default function CustomizationManager() {
   };
 
   return (
-    <div className="bg-white p-6 sm:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] shadow-2xl border border-brand-gold/20">
-      <h2 className="font-logo text-3xl sm:text-5xl mb-8 text-brand-black">Gestione Ingredienti Extra</h2>
+    <div className="bg-white p-12 rounded-[3.5rem] shadow-2xl border border-brand-gold/20">
+      <h2 className="font-logo text-5xl mb-8 text-brand-black">Gestione Ingredienti Extra</h2>
       
-      <div className="bg-brand-paper p-6 sm:p-8 rounded-[1.5rem] sm:rounded-3xl mb-12 border border-brand-black/5">
+      <div className="bg-brand-paper p-8 rounded-3xl mb-12 border border-brand-black/5">
         <h3 className="font-bold text-xl mb-6 text-brand-black uppercase tracking-wide">
           {editingId ? "Modifica Extra" : "Nuovo Ingrediente Extra"}
         </h3>
@@ -113,7 +113,8 @@ export default function CustomizationManager() {
           <div>
             <label className="block text-[10px] uppercase font-black tracking-widest text-brand-black/40 mb-2">Prezzo Aggiuntivo (€)</label>
             <input 
-              type="text" 
+              type="number" 
+              step="0.10"
               value={price}
               onChange={e => setPrice(e.target.value)}
               className="w-full bg-white p-4 rounded-2xl border border-brand-black/10 focus:border-brand-gold outline-none font-bold text-brand-black"
@@ -198,12 +199,12 @@ export default function CustomizationManager() {
               </div>
             </div>
             <div className="flex flex-wrap gap-1 mt-auto">
-              {e.targets && e.targets.slice(0, 3).map(t => (
+              {e.targets.slice(0, 3).map(t => (
                 <span key={t} className="bg-brand-black/5 px-2 py-1 rounded text-[10px] font-bold text-brand-black/60 truncate max-w-full">
                   {t}
                 </span>
               ))}
-              {e.targets && e.targets.length > 3 && (
+              {e.targets.length > 3 && (
                 <span className="bg-brand-black/5 px-2 py-1 rounded text-[10px] font-bold text-brand-black/60">
                   +{e.targets.length - 3}
                 </span>

@@ -8,6 +8,7 @@ import { t } from "../lib/i18n";
 import Portal from "./Portal";
 import { Extra, Product, OrderItem, Language, OrderStatus } from "../types";
 import { allergenIcons } from "../lib/allergenIcons";
+import { useAllergenInteraction } from "../hooks/useAllergenInteraction";
 
 export interface Props {
   lang: Language;
@@ -67,6 +68,8 @@ export default function CustomerInterface(props: Props) {
   const [closedWarningDismissed, setClosedWarningDismissed] = useState(false);
   const [expandedExtraCategory, setExpandedExtraCategory] = useState<string | null>(null);
 
+  const allergenInteraction = useAllergenInteraction(() => setShowAllergensFAQ(true));
+
   React.useEffect(() => {
     if (!isTakeawayClosed) {
       setClosedWarningDismissed(false);
@@ -124,17 +127,17 @@ export default function CustomerInterface(props: Props) {
                   </p>
                   
                   {takeawayHours && (
-                    <div className="bg-white/10 rounded-2xl w-full p-5 mt-2 text-left text-base mb-2 shadow-inner">
-                      <p className="font-black uppercase tracking-widest text-xs mb-3 opacity-70 border-b border-white/20 pb-2">Orari di Apertura</p>
-                      <div className="grid grid-cols-1 gap-1.5">
+                    <div className="bg-white/10 rounded-2xl w-full p-4 mt-2 text-left text-xs mb-2 shadow-inner">
+                      <p className="font-bold uppercase tracking-widest text-[10px] mb-2 opacity-70 border-b border-white/20 pb-2">Orari di Apertura</p>
+                      <div className="grid grid-cols-1 gap-1">
                         {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day) => {
                           const config = takeawayHours[day];
                           if (!config) return null;
                           const dayNames: any = { mon: "Lunedì", tue: "Martedì", wed: "Mercoledì", thu: "Giovedì", fri: "Venerdì", sat: "Sabato", sun: "Domenica" };
                           return (
                             <div key={day} className="flex justify-between items-center py-1">
-                              <span className="font-bold opacity-80 text-sm uppercase tracking-wider">{dayNames[day]}</span>
-                              <span className="font-elegant font-semibold tracking-wide text-base">
+                              <span className="font-bold">{dayNames[day]}</span>
+                              <span className="opacity-90">
                                 {config.closed ? "Chiuso" : `${config.open} - ${config.close}${config.openAfternoon ? ` / ${config.openAfternoon} - ${config.closeAfternoon}` : ''}`}
                               </span>
                             </div>
@@ -522,36 +525,39 @@ export default function CustomerInterface(props: Props) {
           </div>
 
           {/* Opening Hours */}
-          <div className="flex flex-col items-center gap-3 mt-6">
-            <div className="w-12 h-12 rounded-full border border-brand-gold/40 flex items-center justify-center bg-brand-gold/10 text-brand-gold-dark shadow-inner">
-              <Clock size={24} />
-            </div>
-            <h3 className="font-black uppercase tracking-[0.2em] text-[11px] opacity-50">{t("openingHours", lang)}</h3>
-            {takeawayHours ? (
-              <div className="flex flex-col gap-1.5 w-full max-w-[260px] mt-2">
-                {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day) => {
-                  const config = takeawayHours[day];
-                  if (!config) return null;
-                  const dayNames: any = {
-                    mon: "Lun", tue: "Mar", wed: "Mer", 
-                    thu: "Gio", fri: "Ven", sat: "Sab", sun: "Dom"
-                  };
-                  return (
-                    <div key={day} className="flex justify-between py-2 border-b border-brand-black/10 last:border-0 items-start">
-                      <span className="font-black uppercase tracking-widest text-[13px] opacity-60 mt-0.5">{dayNames[day]}</span>
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="font-semibold text-[17px] font-elegant tracking-wide">{config.closed ? "CHIUSO" : `${config.open} - ${config.close}`}</span>
-                        {!config.closed && config.openAfternoon && config.closeAfternoon && (
-                          <span className="font-semibold text-[17px] font-elegant tracking-wide">{`${config.openAfternoon} - ${config.closeAfternoon}`}</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+          <div className="w-full mt-6 flex flex-col items-center">
+            <div className="w-full max-w-sm bg-white p-6 rounded-[2rem] border border-brand-black/5 shadow-xl flex flex-col items-center gap-4">
+              <div className="w-14 h-14 rounded-full border-2 border-brand-gold flex items-center justify-center bg-brand-gold/10 text-brand-gold-dark shadow-inner">
+                <Clock size={28} />
               </div>
-            ) : (
-              <p className="text-sm italic opacity-50">Orari non disponibili</p>
-            )}
+              <h3 className="font-black uppercase tracking-[0.2em] text-[12px] text-brand-black">{t("openingHours", lang)}</h3>
+              {takeawayHours ? (
+                <div className="flex flex-col gap-2 w-full mt-2">
+                  {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day) => {
+                    const config = takeawayHours[day];
+                    if (!config) return null;
+                    const dayNames: any = {
+                      mon: "Lunedì", tue: "Martedì", wed: "Mercoledì", 
+                      thu: "Giovedì", fri: "Venerdì", sat: "Sabato", sun: "Domenica"
+                    };
+                    const isToday = new Date().getDay() === (day === 'sun' ? 0 : ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].indexOf(day) + 1);
+                    return (
+                      <div key={day} className={`flex justify-between py-2 border-b border-brand-black/10 last:border-0 items-start ${isToday ? 'bg-brand-gold/5 -mx-4 px-4 rounded-lg border-b-0' : ''}`}>
+                        <span className={`font-black uppercase tracking-widest text-[11px] mt-0.5 ${isToday ? 'text-brand-gold-dark' : 'opacity-60'}`}>{dayNames[day]}</span>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className={`font-bold text-[14px] ${isToday ? 'text-brand-black' : 'text-brand-black/80'}`}>{config.closed ? "CHIUSO" : `${config.open} - ${config.close}`}</span>
+                          {!config.closed && config.openAfternoon && config.closeAfternoon && (
+                            <span className={`font-bold text-[14px] ${isToday ? 'text-brand-black' : 'text-brand-black/80'}`}>{`${config.openAfternoon} - ${config.closeAfternoon}`}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm font-bold opacity-50 italic py-4">Orari non disponibili</p>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -1220,9 +1226,11 @@ export default function CustomerInterface(props: Props) {
                             {product.name[lang] || product.name.it}
                           </h3>
                           <div className="text-right flex flex-col items-end shrink-0 pt-0.5">
-                            <span className="font-medium text-[17px] tracking-wide text-brand-black/90 whitespace-nowrap">
+                            <span className="font-mono font-black text-[17px] tracking-wide text-brand-gold-dark whitespace-nowrap">
                               {product.category.it.includes("Puglia Bowl")
                                 ? "da € 8.50"
+                                : product.isPricePerKg
+                                  ? `€ ${product.price.toFixed(2)} / KG`
                                 : product.price === 0
                                   ? t("aPeso", lang) || "A peso"
                                 : `€ ${product.price.toFixed(2)}${product.category.it === "Le Formule Aperitivo" ? ` / ${t("person", lang)}` : ""}`}
@@ -1248,12 +1256,13 @@ export default function CustomerInterface(props: Props) {
                               {product.allergens.map((alg) => (
                                 <div
                                   key={alg}
-                                  className="w-8 h-8 relative bg-brand-paper border border-brand-black/5 rounded-xl flex items-center justify-center text-[18px] shadow-sm hover:border-brand-gold hover:shadow-md transition-all group/alg cursor-help"
+                                  className="w-8 h-8 relative bg-brand-paper border border-brand-black/5 rounded-xl flex items-center justify-center text-[18px] shadow-sm hover:border-brand-gold hover:shadow-md transition-all group/alg cursor-pointer"
+                                  {...allergenInteraction.handlers(alg)}
                                 >
                                   <span className="group-hover/alg:scale-110 transition-transform">
                                     {allergenIcons[alg] || "⚠️"}
                                   </span>
-                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover/alg:opacity-100 transition-opacity bg-brand-black text-brand-gold text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-xl whitespace-nowrap z-20">
+                                  <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none transition-opacity bg-brand-black text-brand-gold text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-xl whitespace-nowrap z-20 ${allergenInteraction.activeTooltip === alg ? 'opacity-100' : 'opacity-0 md:group-hover/alg:opacity-100'}`}>
                                     {alg}
                                     <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-brand-black"></div>
                                   </div>
@@ -1368,13 +1377,14 @@ export default function CustomerInterface(props: Props) {
                           </h5>
                           <div className="flex flex-col gap-3">
                             {Object.entries(
-                              relevantExtras.reduce((acc, extra) => {
+                              relevantExtras.reduce((acc: Record<string, Extra[]>, extra) => {
                                 const cat = extra.category ? extra.category.trim() : 'Varie';
                                 if (!acc[cat]) acc[cat] = [];
                                 acc[cat].push(extra);
                                 return acc;
                               }, {} as Record<string, Extra[]>)
-                            ).map(([categoryName, extrasInCat]) => {
+                            ).map(([categoryName, extrasInCatAny]) => {
+                              const extrasInCat = extrasInCatAny as Extra[];
                               const selectedCount = extrasInCat.filter(e => selectedExtras.some(sel => sel.id === e.id)).length;
                               return (
                                 <div key={categoryName} className="bg-white rounded-2xl border border-brand-black/10 overflow-hidden shadow-sm">
@@ -1433,11 +1443,13 @@ export default function CustomerInterface(props: Props) {
                             {selectedProduct.allergens.map((alg) => (
                               <div
                                 key={alg}
-                                className="w-8 h-8 relative bg-brand-gold/10 text-brand-gold-dark border border-brand-gold/30 rounded-full flex items-center justify-center text-[16px] shadow-sm hover:scale-110 transition-all cursor-help group/alg"
+                                className="w-8 h-8 relative bg-brand-gold/10 text-brand-gold-dark border border-brand-gold/30 rounded-full flex items-center justify-center text-[16px] shadow-sm hover:scale-110 transition-all cursor-pointer group/alg"
+                                {...allergenInteraction.handlers(alg)}
                               >
                                 <span>{allergenIcons[alg] || "⚠️"}</span>
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover/alg:opacity-100 transition-opacity bg-brand-black text-brand-gold text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-xl whitespace-nowrap z-20">
+                                <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none transition-opacity bg-brand-black text-brand-gold text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-xl whitespace-nowrap z-20 ${allergenInteraction.activeTooltip === alg ? 'opacity-100' : 'opacity-0 md:group-hover/alg:opacity-100'}`}>
                                   {alg}
+                                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-brand-black"></div>
                                 </div>
                               </div>
                             ))}
@@ -1451,7 +1463,9 @@ export default function CustomerInterface(props: Props) {
                         </p>
                         <div className="text-center mb-4">
                           <span className="font-mono font-black text-2xl text-brand-gold-dark">
-                            {computedPrice === 0
+                            {selectedProduct.isPricePerKg
+                              ? `€ ${computedPrice.toFixed(2)} / KG`
+                              : computedPrice === 0
                               ? t("aPeso", lang) || "A peso"
                               : `€ ${computedPrice.toFixed(2)}${selectedProduct.category.it === "Le Formule Aperitivo" ? ` / ${t("person", lang)}` : ""}`}
                           </span>
@@ -1893,7 +1907,7 @@ export default function CustomerInterface(props: Props) {
                   </span>
                 </div>
               </div>
-              <div className="text-xl font-black">€ {total.toFixed(2)}</div>
+              <div className="text-xl font-mono font-black">€ {total.toFixed(2)}</div>
             </button>
           </motion.div>
         )}
@@ -1931,7 +1945,7 @@ export default function CustomerInterface(props: Props) {
                   onClick={() => setIsCartOpen(false)}
                   className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-all text-white"
                 >
-                  <Minus size={20} className="rotate-45" />
+                  <X size={20} />
                 </button>
               </div>
 
@@ -2005,7 +2019,7 @@ export default function CustomerInterface(props: Props) {
                           </div>
                         )}
                         <span className="text-[10px] opacity-40 font-mono mt-1 block">
-                          € {item.price.toFixed(2)} / cad
+                          € {item.price.toFixed(2)} {products.find(p => p.id === item.productId)?.isPricePerKg ? '/ KG' : '/ cad'}
                         </span>
                         {isManager && (
                           <button
@@ -2023,7 +2037,7 @@ export default function CustomerInterface(props: Props) {
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <div className="text-lg font-black text-brand-gold mb-1">
+                        <div className="text-lg font-mono font-black text-brand-gold mb-1">
                           € {(item.price * item.quantity).toFixed(2)}
                         </div>
                         <div className="flex items-center gap-3 bg-white/5 p-1 px-2 rounded-2xl border border-white/5">
@@ -2175,7 +2189,7 @@ export default function CustomerInterface(props: Props) {
                   <span className="block text-[10px] uppercase font-black tracking-widest opacity-60 mb-1">
                     {editMode ? "Totale Modificato" : t("total", lang)}
                   </span>
-                  <span className="text-4xl font-black text-brand-gold leading-none">
+                  <span className="text-4xl font-mono font-black text-brand-gold leading-none">
                     € {total.toFixed(2)}
                   </span>
                 </div>

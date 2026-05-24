@@ -48,31 +48,11 @@ export const getMenu = (): Product[] => {
           pChanged = true;
         }
 
-        if (sourceItem) {
-          if (sourceItem.allergens && JSON.stringify(newP.allergens) !== JSON.stringify(sourceItem.allergens)) {
+        if (sourceItem && sourceItem.allergens) {
+          // If the allergens are different, update them
+          if (JSON.stringify(newP.allergens) !== JSON.stringify(sourceItem.allergens)) {
             newP.allergens = sourceItem.allergens;
             pChanged = true;
-          }
-          if (newP.name && sourceItem.name) {
-            if (!newP.name.en && sourceItem.name.en) { newP.name.en = sourceItem.name.en; pChanged = true; }
-            if (!newP.name.de && sourceItem.name.de) { newP.name.de = sourceItem.name.de; pChanged = true; }
-            if (!newP.name.fr && sourceItem.name.fr) { newP.name.fr = sourceItem.name.fr; pChanged = true; }
-          }
-          if (newP.description && sourceItem.description) {
-            if (!newP.description.en && sourceItem.description.en) { newP.description.en = sourceItem.description.en; pChanged = true; }
-            if (!newP.description.de && sourceItem.description.de) { newP.description.de = sourceItem.description.de; pChanged = true; }
-            if (!newP.description.fr && sourceItem.description.fr) { newP.description.fr = sourceItem.description.fr; pChanged = true; }
-          }
-          if (newP.category && sourceItem.category) {
-            if (!newP.category.en && sourceItem.category.en) { newP.category.en = sourceItem.category.en; pChanged = true; }
-            if (!newP.category.de && sourceItem.category.de) { newP.category.de = sourceItem.category.de; pChanged = true; }
-            if (!newP.category.fr && sourceItem.category.fr) { newP.category.fr = sourceItem.category.fr; pChanged = true; }
-            
-            // Force English category update for "Le Formule Aperitivo"
-            if (newP.category.it === "Le Formule Aperitivo" && newP.category.en !== "Aperitif Formulas") {
-              newP.category.en = "Aperitif Formulas";
-              pChanged = true;
-            }
           }
         }
         

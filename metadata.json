@@ -1,6 +1,6 @@
 {
-  "name": "Enoteca & Salumeria Gigliola",
-  "description": "App per la gestione delle comande",
+  "name": "",
+  "description": "",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

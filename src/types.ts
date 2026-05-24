@@ -23,6 +23,7 @@ export interface Product {
   name: MultilingualString;
   category: MultilingualString;
   price: number;
+  isPricePerKg?: boolean;
   description: MultilingualString;
   imageUrl?: string;
   available: boolean;
@@ -33,7 +34,7 @@ export interface Product {
   requiresWeight?: boolean;
 }
 
-export type OrderStatus = 'pending' | 'preparing' | 'served' | 'paid' | 'cancelled' | 'linked';
+export type OrderStatus = 'pending' | 'preparing' | 'served' | 'paid' | 'delivered' | 'cancelled' | 'linked';
 
 export interface OrderItem {
   productId: string;
@@ -68,4 +69,10 @@ export interface Order {
   updatedAt: any; // Firestore Timestamp
   allOrderIds?: string[]; // IDs of merged orders
   linkedTables?: string[]; // Numbers of linked tables
+  payments?: any[]; // Payment history
+  romana?: {
+    totalQuotas: number;
+    paidQuotas: number;
+    quotaValue: number;
+  };
 }

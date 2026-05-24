@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Product } from "../types";
 import { getMenu, addMenuItem, updateMenuItem, deleteMenuItem, undoLastAction, canUndo, saveMenu, getCategoryMacros, setCategoryMacro } from "../lib/menuService";
-import { Plus, Edit2, Trash2, Check, X, FileText, Tag, Euro, AlignLeft, Undo2, ChevronUp, ChevronDown, Download } from "lucide-react";
+import { Plus, Edit2, Trash2, Check, X, FileText, Tag, Euro, AlignLeft, Undo2, ChevronUp, ChevronDown } from "lucide-react";
 import { motion } from "motion/react";
 import { allergenIcons } from "../lib/allergenIcons";
-import html2pdf from "html2pdf.js";
+import { PdfExportModal } from "./PdfExportModal";
+
+import { generateMenuPdf } from "../lib/pdfExport";
 
 const getMacroCategory = (cat: string) => {
   const macrosMap = getCategoryMacros();
@@ -32,6 +34,7 @@ export default function MenuManager() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
   const [showNewCategoryInput, setShowNewInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -41,6 +44,7 @@ export default function MenuManager() {
     category: "",
     description: "",
     price: 0,
+    isPricePerKg: false,
     available: true,
     isVisible: true,
     allergens: [] as string[],
@@ -93,6 +97,7 @@ export default function MenuManager() {
       category: "",
       description: "",
       price: 0,
+      isPricePerKg: false,
       available: true,
       isVisible: true,
       allergens: [],
@@ -110,6 +115,7 @@ export default function MenuManager() {
       category: product.category.it,
       description: product.description.it || "",
       price: product.price,
+      isPricePerKg: product.isPricePerKg || false,
       available: product.available,
       isVisible: product.isVisible !== false, // Default to true if undefined
       allergens: product.allergens || [],
@@ -194,31 +200,6 @@ export default function MenuManager() {
   };
 
   const [isTranslating, setIsTranslating] = useState(false);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-
-  const downloadMenuPDF = async () => {
-    setIsGeneratingPDF(true);
-    try {
-      const element = document.getElementById("pdf-menu-container");
-      if (!element) return;
-      
-      const opt = {
-        margin:       [15, 0, 15, 0], // top, left, bottom, right
-        filename:     'Menu_Gigliola.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'], avoid: '.avoid-break' }
-      };
-
-      await html2pdf().from(element).set(opt).save();
-    } catch (e) {
-      console.error(e);
-      alert("Errore durante la generazione del PDF");
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
 
   const translateText = async (text: string, targetLang: string) => {
     if (!text) return "";
@@ -275,6 +256,7 @@ export default function MenuManager() {
       category: { it: finalCategory, en: catEn, de: catDe, fr: catFr },
       description: { it: formData.description, en: descEn, de: descDe, fr: descFr },
       price: formData.price,
+      isPricePerKg: formData.isPricePerKg,
       available: formData.available,
       isVisible: formData.isVisible,
       allergens: formData.allergens,
@@ -310,11 +292,10 @@ export default function MenuManager() {
               </button>
             )}
             <button
-              onClick={downloadMenuPDF}
-              disabled={isGeneratingPDF}
-              className="flex items-center gap-2 bg-white border border-brand-black/10 text-brand-black px-6 py-3 rounded-full font-black uppercase tracking-widest text-xs hover:bg-brand-paper active:scale-95 transition-all shadow-sm disabled:opacity-50"
+              onClick={() => setIsPdfModalOpen(true)}
+              className="flex items-center gap-2 bg-brand-paper border border-brand-black/10 text-brand-black px-6 py-3 rounded-full font-black uppercase tracking-widest text-xs hover:bg-brand-black/5 active:scale-95 transition-all shadow-sm"
             >
-              <Download size={16} /> {isGeneratingPDF ? "Generazione..." : "Scarica PDF"}
+              <FileText size={16} /> Esporta in PDF
             </button>
             <button
               onClick={() => setIsAdding(true)}
@@ -422,16 +403,27 @@ export default function MenuManager() {
               <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-60 mb-2">
                 <Euro size={12} /> Prezzo (€)
               </label>
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleInputChange}
-                step="0.10"
-                min="0"
-                required
-                className="w-full bg-white p-4 rounded-xl border border-brand-black/10 focus:border-brand-black focus:outline-none transition-all font-mono font-bold text-brand-gold-dark"
-              />
+              <div className="flex items-center gap-4">
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  step="0.10"
+                  min="0"
+                  required
+                  className="w-full bg-white p-4 rounded-xl border border-brand-black/10 focus:border-brand-black focus:outline-none transition-all font-mono font-bold text-brand-gold-dark"
+                />
+                <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
+                  <input 
+                    type="checkbox" 
+                    checked={formData.isPricePerKg} 
+                    onChange={e => setFormData(prev => ({ ...prev, isPricePerKg: e.target.checked }))}
+                    className="w-5 h-5 accent-brand-black"
+                  />
+                  <span className="text-sm font-bold text-brand-black tracking-wide">Prezzo al KG</span>
+                </label>
+              </div>
             </div>
             <div className="flex flex-col gap-4 mt-6">
               <label className="flex items-center gap-3 cursor-pointer">
@@ -689,83 +681,14 @@ export default function MenuManager() {
         </table>
       </div>
 
-      {/* Hidden PDF Generation Container */}
-      <div style={{ position: "fixed", left: "-9999px", top: 0, zIndex: -100 }}>
-        <div id="pdf-menu-container" className="w-[800px] p-12 font-sans" style={{ backgroundColor: '#FDFCF9', color: '#1A1A1A' }}>
-          <div className="flex justify-center mb-12 border-b pb-8" style={{ borderColor: 'rgba(26, 26, 26, 0.1)' }}>
-            <img src="/unnamed.png" alt="Logo" className="h-32 object-contain" crossOrigin="anonymous" />
-          </div>
-          
-          <div className="space-y-12">
-            {(() => {
-              const macros = ["Food & Sfizi", "Piatti & Specialità", "Cantina", "Bar & Cafè", "Extra / Altro"];
-              return macros.map(macro => {
-                const macroCats = categories.filter(c => getMacroCategory(c) === macro);
-                if (macroCats.length === 0) return null;
-                
-                return (
-                  <div key={macro} className="mb-10">
-                    <h1 className="font-logo text-3xl text-center mb-8 pb-4 border-b-2 uppercase tracking-[0.3em] font-bold" style={{ borderColor: 'rgba(26, 26, 26, 0.2)' }}>{macro}</h1>
-                    {macroCats.map(cat => {
-                      const catProducts = products.filter(p => p.category.it === cat && p.isVisible !== false);
-                      if (catProducts.length === 0) return null;
-                      
-                      const catEn = catProducts[0]?.category?.en;
-                      
-                      return (
-                        <div key={cat} className="mb-8 avoid-break block">
-                          <h2 className="font-bold uppercase tracking-widest text-lg mb-6 leading-tight avoid-break block" style={{ color: 'rgba(26, 26, 26, 0.8)' }}>
-                            {cat}
-                            {catEn && catEn !== cat && (
-                              <span className="text-base italic font-serif ml-2 normal-case" style={{ color: 'rgba(26, 26, 26, 0.6)' }}>/ {catEn}</span>
-                            )}
-                          </h2>
-                          <div className="grid grid-cols-1 gap-6">
-                            {catProducts.map(product => (
-                              <div key={product.id} className="avoid-break block">
-                                <div className="flex justify-between items-start gap-4">
-                                  <div className="flex-1">
-                                    <h3 className="font-bold text-xl leading-tight font-elegant tracking-wide">
-                                      {product.name.it}
-                                      {product.name.en && product.name.en !== product.name.it && (
-                                        <span className="text-lg ml-2 italic font-serif" style={{ color: 'rgba(26, 26, 26, 0.5)' }}>/ {product.name.en}</span>
-                                      )}
-                                    </h3>
-                                    {(product.description.it || product.description.en) && (
-                                      <p className="text-[15px] opacity-80 mt-1.5 leading-relaxed font-serif">
-                                        {product.description.it}
-                                        {product.description.en && product.description.en !== product.description.it && (
-                                          <span className="block italic mt-0.5 opacity-70">{product.description.en}</span>
-                                        )}
-                                      </p>
-                                    )}
-                                    {product.allergens && product.allergens.length > 0 && (
-                                      <p className="text-[11px] mt-2 uppercase tracking-widest" style={{ color: 'rgba(26, 26, 26, 0.5)' }}>
-                                        <span className="font-black">Allergeni:</span> {product.allergens.join(", ")}
-                                      </p>
-                                    )}
-                                  </div>
-                                  <div className="font-serif font-bold text-xl whitespace-nowrap mt-1">
-                                    € {product.price.toFixed(2)}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              });
-            })()}
-          </div>
-          
-          <div className="mt-16 pt-8 border-t text-center opacity-60 text-xs font-serif italic" style={{ borderColor: 'rgba(26, 26, 26, 0.1)' }}>
-            Enoteca Gigliola - Via Milo, 72019 San Vito dei Normanni (BR)
-          </div>
-        </div>
-      </div>
+      <PdfExportModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        onExport={(maxPages, columns) => {
+          generateMenuPdf(products, maxPages, columns);
+          setIsPdfModalOpen(false);
+        }}
+      />
     </div>
   );
 }
