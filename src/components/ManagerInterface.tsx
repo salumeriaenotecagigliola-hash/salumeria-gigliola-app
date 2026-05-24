@@ -184,13 +184,23 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
     const isFullyPaid = newPaidAmount >= paymentOrder.total - 0.01;
     const newStatus = isFullyPaid ? "paid" : paymentOrder.status;
 
+    let detailDescription = "Pagamento parziale/totale";
+    if (isRomana) {
+       detailDescription = "Quota alla Romana";
+    } else if (itemsToMarkAsPaid.length > 0) {
+       detailDescription = "Articoli: " + itemsToMarkAsPaid.map(it => it.qty + "x " + paymentOrder.items[it.idx].name).join(", ");
+    } else if (isFullyPaid) {
+       detailDescription = "Saldo totale";
+    }
+
     const newPaymentRecord: any = JSON.parse(JSON.stringify({
       id: Date.now().toString(),
       amount: amountToPay,
       method: paymentMethod,
       documentType,
       invoiceData: documentType === 'fattura' ? invoiceData : null,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      description: detailDescription
     }));
     
     if (isRomana) {
@@ -306,12 +316,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
          });
       }
 
-      if (whatsappReceipt && whatsappNumber) {
-        const fullNumber = whatsappPrefix.replace(/\+/g, '') + whatsappNumber.replace(/\s+/g, '');
-        let itemsText = paymentOrder.items.map(it => `${it.quantity}x ${it.name} - %E2%82%AC${(it.price * it.quantity).toFixed(2)}`).join('%0A');
-        let text = `*RICEVUTA DI PAGAMENTO*%0A%0ATavolo: ${paymentOrder.tableNumber}%0ATotale Ordine: %E2%82%AC${paymentOrder.total.toFixed(2)}%0AImporto Pagato Ora: %E2%82%AC${amountToPay.toFixed(2)}%0AMetodo: ${paymentMethod.toUpperCase()}%0A%0A*Dettaglio Prodotti:*%0A${itemsText}%0A%0AGrazie per averci scelto!`;
-        window.open(`https://wa.me/${fullNumber}?text=${text}`, '_blank');
-      }
+
 
       setTimeout(() => {
         setIsProcessingPayment(false);
@@ -2495,20 +2500,16 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                            <Receipt size={20} /> GESTISCI PAGAMENTO
                          </button>
                        )}
-                       {order.status === "paid" && (
+                       {(order.status === "paid" || order.status === "delivered") && (
                          <button
-                           onClick={() => updateStatus(order.id, "delivered", "paid")}
-                           className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
+                           onClick={() => {
+                             const originalOrder = (order as any).originalGroupedOrder || orders.find(o => o.id === order.id) || order;
+                             setPaymentOrder(originalOrder);
+                             setSelectedItemsForPayment([]);
+                           }}
+                           className="w-full bg-brand-gold text-brand-black py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all border border-brand-black/10"
                          >
-                           <Truck size={20} /> SEGNALA COME CONSEGNATO
-                         </button>
-                       )}
-                       {order.status === "delivered" && (
-                         <button
-                           onClick={() => updateStatus(order.id, "paid", "delivered")}
-                           className="w-full bg-brand-gold text-brand-black py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
-                         >
-                           <Receipt size={20} /> SEGNALA COME PAGATO
+                           <ClipboardList size={20} /> STORICO PAGAMENTI
                          </button>
                        )}
                     </div>
@@ -3015,7 +3016,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                           <button
                             onClick={async () => {
                                try {
-                                   const blob = await generateReceiptPdfBlob(paymentOrder, payment.amount, payment.method);
+                                   const blob = await generateReceiptPdfBlob(paymentOrder, payment.amount, payment.method, payment.description || "");
                                    const file = new File([blob], `ricevuta_${paymentOrder.tableNumber}_${Date.now()}.pdf`, { type: 'application/pdf' });
                                    
                                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -3473,39 +3474,9 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
               )}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-brand-black/10">
-               <label className="flex items-center gap-3 cursor-pointer">
-                 <input
-                   type="checkbox"
-                   checked={whatsappReceipt}
-                   onChange={(e) => setWhatsappReceipt(e.target.checked)}
-                   className="w-5 h-5 accent-brand-black"
-                 />
-                 <span className="font-bold text-sm tracking-wide text-brand-black">Invia ricevuta tramite WhatsApp</span>
-               </label>
-               {whatsappReceipt && (
-                 <div className="mt-4 flex gap-2">
-                   <input
-                     type="text"
-                     value={whatsappPrefix}
-                     onChange={(e) => setWhatsappPrefix(e.target.value)}
-                     className="w-20 bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium border border-brand-black/10 focus:border-brand-gold outline-none transition-all text-center"
-                     placeholder="+39"
-                   />
-                   <input
-                     type="tel"
-                     value={whatsappNumber}
-                     onChange={(e) => setWhatsappNumber(e.target.value)}
-                     placeholder="Numero di telefono"
-                     className="flex-1 bg-brand-paper px-4 py-3 rounded-xl text-sm font-medium placeholder-brand-black/30 border border-brand-black/10 focus:border-brand-gold outline-none transition-all"
-                   />
-                 </div>
-               )}
-            </div>
-
             <button
                onClick={() => {
-                 handlePayAmount(pendingPayment.amount, pendingPayment.items).then(() => {
+                 handlePayAmount(pendingPayment.amount, pendingPayment.items, pendingPayment.isRomana).then(() => {
                    setPendingPayment(null);
                  });
                }}

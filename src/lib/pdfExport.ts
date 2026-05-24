@@ -161,7 +161,7 @@ export async function generateMenuPdf(
   finalDoc.save("Menu.pdf");
 }
 
-export async function generateReceiptPdfBlob(order: any, paymentAmount: number, paymentMethod: string, logoUrl: string = '/unnamed.png') {
+export async function generateReceiptPdfBlob(order: any, paymentAmount: number, paymentMethod: string, paymentDescription: string = "", logoUrl: string = '/unnamed.png') {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [80, 200] }); // standard receipt thermal printer format width 80mm
   
   const logoImg = await new Promise<HTMLImageElement | null>((resolve) => {
@@ -225,7 +225,16 @@ export async function generateReceiptPdfBlob(order: any, paymentAmount: number, 
   
   doc.setFontSize(10);
   doc.text(`Metodo: ${paymentMethod.toUpperCase()}`, 5, currentY);
-  currentY += 15;
+  currentY += 6;
+  if (paymentDescription) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    const descLines = doc.splitTextToSize(`Nota: ${paymentDescription}`, 70);
+    doc.text(descLines, 5, currentY);
+    currentY += (descLines.length * 4) + 6;
+  } else {
+    currentY += 9;
+  }
   
   doc.setFont("helvetica", "italic");
   doc.text("Grazie per averci scelto!", 40, currentY, { align: "center" });
