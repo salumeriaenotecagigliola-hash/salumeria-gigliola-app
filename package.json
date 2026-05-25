@@ -1,5 +1,6 @@
 {
   "name": "react-example",
+  "author": "Beatrice Gigliola",
   "private": true,
   "version": "0.0.0",
   "type": "module",
