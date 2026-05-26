@@ -40,7 +40,7 @@ export const getMenu = (): Product[] => {
       // Force sync allergens from menu.json for existing products to ensure the new mapping is applied
       parsed = parsed.map(p => {
         let pChanged = false;
-        const sourceItem = (menuData as any[]).find(m => m.name.it === p.name.it);
+        const sourceItem = (menuData as any[]).find(m => m.name.it === p.name.it && m.category.it === p.category.it);
         const newP = { ...p };
         
         if (!newP.id) {
