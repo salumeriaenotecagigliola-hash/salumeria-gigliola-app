@@ -209,6 +209,16 @@ export function useCustomerState(props: Props) {
     const unsub = onSnapshot(doc(db, "settings", "takeawayHours"), (snap) => {
       if (snap.exists()) {
         setTakeawayHours(snap.data());
+      } else {
+        setTakeawayHours({
+            mon: { open: "12:00", close: "15:00", closed: true },
+            tue: { open: "12:00", close: "15:00", openAfternoon: "18:00", closeAfternoon: "23:00", closed: false },
+            wed: { open: "12:00", close: "15:00", openAfternoon: "18:00", closeAfternoon: "23:00", closed: false },
+            thu: { open: "12:00", close: "15:00", openAfternoon: "18:00", closeAfternoon: "23:00", closed: false },
+            fri: { open: "12:00", close: "15:00", openAfternoon: "18:00", closeAfternoon: "23:00", closed: false },
+            sat: { open: "12:00", close: "15:00", openAfternoon: "18:00", closeAfternoon: "23:00", closed: false },
+            sun: { open: "18:00", close: "23:00", closed: false },
+        });
       }
     });
     return () => unsub();
