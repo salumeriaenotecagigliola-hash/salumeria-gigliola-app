@@ -11,9 +11,7 @@ try {
     immediate: true,
     onRegisteredSW(swUrl, r) {
       if (r) {
-        setInterval(() => {
-          r.update();
-        }, 60 * 1000); // Check every minute
+        // Removed frequent update interval that causes 429 Too Many Requests
       }
       
       // Check for updates every time the app becomes visible
