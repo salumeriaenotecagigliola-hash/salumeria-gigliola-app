@@ -59,7 +59,7 @@ import {
 } from "recharts";
 import { motion, AnimatePresence } from "motion/react";
 import { t } from "../lib/i18n";
-import Logo, { LogoG } from "./Logo";
+import Logo from "./Logo";
 import CustomerInterface from "./CustomerInterface";
 import PullToRefresh from "./PullToRefresh";
 

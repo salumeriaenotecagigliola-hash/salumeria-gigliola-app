@@ -18,7 +18,7 @@ import { t } from "./lib/i18n";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db, auth, loginWithGoogle, logout } from "./lib/firebase";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import Logo, { LogoG } from "./components/Logo";
+import Logo from "./components/Logo";
 import { motion, AnimatePresence } from "motion/react";
 import PullToRefresh from "./components/PullToRefresh";
 

@@ -7,7 +7,7 @@ import { ErrorBoundary } from './ErrorBoundary.tsx';
 
 // Register service worker
 try {
-  const updateSW = registerSW({ 
+  registerSW({ 
     immediate: true,
     onRegisteredSW(swUrl, r) {
       if (r) {

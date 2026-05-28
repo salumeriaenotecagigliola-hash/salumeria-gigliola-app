@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useCustomerState, getMacroCategory } from "../hooks/useCustomerState";
-import { ShoppingCart, Plus, Minus, Send, ClipboardList, Info, X, Download, Settings, ChevronDown, Menu, Globe, ListChecks, CheckCircle2, ArrowRightLeft, ArrowLeft, ShieldCheck, Bell, Search, MapPin, Clock, Facebook, Instagram, Star } from "lucide-react";
-import Logo, { LogoG } from "./Logo";
+import { ShoppingCart, Plus, Minus, Send, ClipboardList, Info, X, Download, Settings, ChevronDown, Menu, Globe, ListChecks, CheckCircle2, ArrowRightLeft, ArrowLeft, Bell, Search, MapPin, Clock, Facebook, Instagram, Star } from "lucide-react";
+import Logo from "./Logo";
 import PullToRefresh from "./PullToRefresh";
 import { motion, AnimatePresence } from "motion/react";
 import { t } from "../lib/i18n";
