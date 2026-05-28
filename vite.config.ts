@@ -15,7 +15,10 @@ export default defineConfig(({mode}) => {
         registerType: 'autoUpdate',
         includeAssets: ['logo-192.png', 'logo-512.png', 'app-icon-192.png', 'app-icon-512.png'],
         workbox: {
-          maximumFileSizeToCacheInBytes: 5000000 // 5MB
+          maximumFileSizeToCacheInBytes: 5000000, // 5MB
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: true
         },
         manifest: {
           name: 'Gigliola Enoteca',
