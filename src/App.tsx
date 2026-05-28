@@ -23,11 +23,19 @@ import { motion, AnimatePresence } from "motion/react";
 import PullToRefresh from "./components/PullToRefresh";
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [lang, setLang] = useState<Language>("it");
   const [showSettings, setShowSettings] = useState(false);
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [minPrepTime, setMinPrepTime] = useState<number>(30);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -86,6 +94,27 @@ export default function App() {
 
   return (
     <div className="min-h-[100dvh] font-sans bg-brand-paper selection:bg-brand-gold selection:text-brand-black pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+      {/* Splash Screen */}
+      <AnimatePresence>
+        {showSplash && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="fixed inset-0 z-[99999] bg-brand-paper flex flex-col items-center justify-center p-4 backdrop-blur-3xl"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="flex justify-center"
+            >
+              <LogoG size="xl" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Offline Banner */}
       <AnimatePresence>
         {!isOnline && (
