@@ -60,7 +60,7 @@ export default defineConfig(({mode}) => {
         },
         injectRegister: null,
         devOptions: {
-          enabled: true,
+          enabled: false,
           type: 'module',
         }
       })
