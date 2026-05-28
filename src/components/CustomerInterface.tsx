@@ -196,7 +196,7 @@ export default function CustomerInterface(props: Props) {
       <div className="max-w-md mx-auto p-4 sm:p-6 pb-2 flex flex-col gap-6">
 
       {/* Header Area */}
-      <header className={`sticky top-0 z-40 bg-brand-paper/95 backdrop-blur-xl -mx-4 sm:-mx-6 px-4 sm:px-6 flex items-center justify-between border-b border-brand-black/5 transition-all duration-300 ${isScrolled ? "py-1 shadow-sm" : "py-3 mb-2"}`}>
+      <header id="main-header" className={`sticky top-0 z-40 bg-brand-paper/95 backdrop-blur-xl -mx-4 sm:-mx-6 px-4 sm:px-6 flex items-center justify-between border-b border-brand-black/5 transition-all duration-300 ${isScrolled ? "py-1 shadow-sm min-h-[52px]" : "py-3 mb-2 min-h-[90px]"}`}>
         <div className="flex gap-2 w-12 shrink-0">
           <button 
             onClick={() => setIsDrawerOpen(true)}
@@ -383,7 +383,7 @@ export default function CustomerInterface(props: Props) {
                   </button>
                 )}
                 
-                <div className="flex justify-center mt-6 opacity-30 grayscale pointer-events-none">
+                <div className="flex justify-center mt-auto pt-6 pb-2 pointer-events-none">
                   <Logo size="md" />
                 </div>
               </div>
@@ -1199,7 +1199,7 @@ export default function CustomerInterface(props: Props) {
           <div id="category-navigation" className={`sticky z-30 bg-brand-paper/95 backdrop-blur-xl -mx-4 sm:-mx-6 px-4 sm:px-6 border-b border-brand-black/5 shadow-sm flex flex-col transition-all duration-300 ${
             isScrolled 
               ? "top-[52px] pt-1 pb-1 gap-1 mb-2" 
-              : "top-[76px] pt-4 pb-6 gap-6 mb-10"
+              : "top-[90px] pt-4 pb-6 gap-6 mb-10"
           }`}>            
             {/* Macro Categories - 2 Lines Grid */}
             <div className={`grid grid-cols-2 transition-all duration-300 ${isScrolled ? "gap-1" : "gap-3 sm:gap-4"}`}>
