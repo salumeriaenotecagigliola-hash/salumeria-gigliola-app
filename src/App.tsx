@@ -28,6 +28,14 @@ export default function App() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [minPrepTime, setMinPrepTime] = useState<number>(30);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isSplashActive, setIsSplashActive] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsSplashActive(false);
+    }, 1500); // 1.5s splash logo presentation
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -86,6 +94,37 @@ export default function App() {
 
   return (
     <div className="min-h-[100dvh] font-sans bg-brand-paper selection:bg-brand-gold selection:text-brand-black pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+      {/* App Open Splash Screen */}
+      <AnimatePresence>
+        {isSplashActive && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100000] bg-brand-paper flex flex-col items-center justify-center p-6 select-none"
+          >
+            <div className="flex flex-col items-center max-w-xs text-center">
+              <motion.img
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                src={`${import.meta.env.BASE_URL}unnamed(1).png`}
+                alt="Gigliola Logo"
+                className="w-40 sm:w-48 h-auto object-contain max-h-[50vh] drop-shadow-md"
+              />
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.4 }}
+                transition={{ delay: 0.5 }}
+                className="mt-8 text-[11px] font-black uppercase tracking-[0.4em] text-brand-black"
+              >
+                Caricamento...
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Offline Banner */}
       <AnimatePresence>
         {!isOnline && (

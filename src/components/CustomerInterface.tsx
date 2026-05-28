@@ -479,7 +479,10 @@ export default function CustomerInterface(props: Props) {
       </AnimatePresence></Portal>
 
       {(!isJoined && ["welcome", "orderTable", "takeaway", "callWaiterForm"].includes(customerMode)) && (
-        <div className="bg-brand-paper px-5 py-10 mx-2.5 my-5 rounded-[2.5rem] shadow-2xl shadow-brand-black/5 border border-brand-gold/20 flex flex-col gap-4">
+        <div className="bg-brand-paper px-5 py-8 mx-2.5 my-5 rounded-[2.5rem] shadow-2xl shadow-brand-black/5 border border-brand-gold/20 flex flex-col gap-4">
+          <div className="flex justify-center mb-2 mt-2">
+            <Logo size="lg" />
+          </div>
           {isManager ? (
             <>
               <h2 className="text-2xl font-serif text-center font-bold mb-4">Nuovo Ordine</h2>
@@ -488,7 +491,7 @@ export default function CustomerInterface(props: Props) {
             </>
           ) : (
             <>
-              <h2 className="text-2xl font-serif text-center font-bold mb-4">{t("welcome", lang)}</h2>
+              <h2 className="text-2xl font-serif text-center font-bold mb-4 mt-2">{t("welcome", lang)}</h2>
               <button onClick={() => { setCustomerMode("menuOnly"); setIsJoined(true); }} className="p-4 mb-8 bg-white border border-brand-black/10 text-brand-black rounded-2xl font-black uppercase tracking-widest hover:bg-brand-paper hover:scale-[1.02] active:scale-95 transition-all shadow-sm">{t("viewMenuBtn", lang)}</button>
               {(!customerOrdersSettings || customerOrdersSettings.allowTableOrders) && (
                 <button onClick={() => setCustomerMode("orderTable")} className="p-4 mb-3 bg-white border border-brand-black/10 text-brand-black rounded-2xl font-black uppercase tracking-widest hover:bg-brand-paper hover:scale-[1.02] active:scale-95 transition-all shadow-sm">{t("orderTableBtn", lang)}</button>

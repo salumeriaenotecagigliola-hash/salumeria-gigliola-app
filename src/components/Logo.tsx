@@ -16,7 +16,7 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
 
   return (
     <img 
-      src={`${import.meta.env.BASE_URL}gigliola-wide.png`}
+      src={`${import.meta.env.BASE_URL}unnamed.png`}
       alt="Enoteca Gigliola"
       className={`w-auto object-contain flex-shrink-0 transition-all duration-300 ${sizeClasses[size]} ${className}`}
     />
@@ -34,7 +34,7 @@ export function LogoG({ size = 'md', className = '' }: { size?: 'xs' | 'sm' | 'm
 
   return (
     <img 
-      src={`${import.meta.env.BASE_URL}g-logo.png`}
+      src={`${import.meta.env.BASE_URL}unnamed(1).png`}
       alt="G"
       className={`w-auto object-contain flex-shrink-0 transition-all duration-300 ${sizeClasses[size]} ${className}`}
     />
