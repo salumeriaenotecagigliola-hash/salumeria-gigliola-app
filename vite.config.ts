@@ -60,7 +60,7 @@ export default defineConfig(({}) => {
             }
           ]
         },
-        injectRegister: null,
+        injectRegister: 'inline',
         devOptions: {
           enabled: false,
           type: 'module',
