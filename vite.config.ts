@@ -23,6 +23,7 @@ export default defineConfig(({}) => {
           skipWaiting: true
         },
         manifest: {
+          id: '/',
           name: 'Gigliola Enoteca',
           short_name: 'Gigliola',
           description: 'Ordini e Menù Digitale Salumeria Enoteca Gigliola',
@@ -30,6 +31,8 @@ export default defineConfig(({}) => {
           background_color: '#ffffff',
           start_url: '/',
           display: 'standalone',
+          orientation: 'portrait',
+          lang: 'it',
           icons: [
             {
               src: '/logo-192.png',
