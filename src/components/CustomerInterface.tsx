@@ -196,7 +196,7 @@ export default function CustomerInterface(props: Props) {
       <div className="max-w-md mx-auto p-4 sm:p-6 pb-2 flex flex-col gap-6">
 
       {/* Header Area */}
-      <header className={`sticky top-0 z-40 bg-brand-paper/95 backdrop-blur-xl -mx-4 sm:-mx-6 px-4 sm:px-6 flex items-center justify-between border-b border-brand-black/5 transition-all duration-300 ${isScrolled ? "py-1 shadow-sm h-[52px]" : "py-3 mb-2 h-[76px]"}`}>
+      <header className={`sticky top-0 z-40 bg-brand-paper/95 backdrop-blur-xl -mx-4 sm:-mx-6 px-4 sm:px-6 flex items-center justify-between border-b border-brand-black/5 transition-all duration-300 ${isScrolled ? "py-1 shadow-sm" : "py-3 mb-2"}`}>
         <div className="flex gap-2 w-12 shrink-0">
           <button 
             onClick={() => setIsDrawerOpen(true)}
@@ -265,7 +265,7 @@ export default function CustomerInterface(props: Props) {
               className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-brand-paper shadow-2xl z-[210] flex flex-col pt-10 pb-8 px-5 border-r border-brand-gold/10 overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-10 border-b border-brand-black/5 pb-6">
-                <Logo size="sm" />
+                <Logo size="lg" />
                 <button
                   onClick={() => setIsDrawerOpen(false)}
                   className="p-2 rounded-full hover:bg-brand-black/5 text-brand-black/50 hover:text-brand-black transition-colors"
@@ -377,11 +377,15 @@ export default function CustomerInterface(props: Props) {
                 {onOpenAdmin && (
                   <button 
                     onClick={() => { onOpenAdmin(); setIsDrawerOpen(false); }} 
-                    className="w-full text-left p-4 rounded-2xl bg-brand-black/5 text-brand-black/40 hover:text-brand-black transition-colors font-black uppercase tracking-widest text-[10px] flex items-center justify-between"
+                    className="w-full text-left p-4 rounded-2xl bg-brand-black/5 text-brand-black/40 hover:text-brand-black transition-colors font-black uppercase tracking-widest text-[10px] flex items-center justify-between mb-4"
                   >
                     {t("staffArea", lang)} <Settings size={14} />
                   </button>
                 )}
+                
+                <div className="flex justify-center mt-6 opacity-30 grayscale pointer-events-none">
+                  <Logo size="md" />
+                </div>
               </div>
             </motion.div>
           </>
@@ -1381,8 +1385,8 @@ export default function CustomerInterface(props: Props) {
       )}
 
       {/* Footer Logo */}
-      <footer className="mt-12 mb-20 flex flex-col items-center justify-center gap-4 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-        <LogoG size="sm" />
+      <footer className="mt-12 mb-20 flex flex-col items-center justify-center gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+        <Logo size="md" />
       </footer>
 
       {/* Product Modal */}

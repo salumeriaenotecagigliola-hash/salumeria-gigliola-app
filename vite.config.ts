@@ -51,6 +51,10 @@ export default defineConfig(({mode}) => {
               purpose: 'maskable'
             }
           ]
+        },
+        devOptions: {
+          enabled: true,
+          type: 'module',
         }
       })
     ],

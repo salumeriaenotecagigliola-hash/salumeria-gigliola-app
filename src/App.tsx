@@ -118,7 +118,7 @@ export default function App() {
         <div className="fixed inset-0 z-[110] bg-brand-black/60 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-white p-8 rounded-[3rem] w-full max-w-sm shadow-[0_30px_100px_rgba(0,0,0,0.5)] border border-brand-gold/10">
             <div className="flex justify-center mb-8 px-4">
-              <Logo size="xl" />
+              <Logo size="md" />
             </div>
 
             <div className="pt-8 mx-auto w-full">
