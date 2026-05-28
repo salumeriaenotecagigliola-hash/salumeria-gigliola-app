@@ -7,9 +7,9 @@ interface LogoProps {
 
 export default function Logo({ size = 'md', className = '' }: LogoProps) {
   const sizeClasses = {
-    xs: 'h-14 min-h-[56px]',
+    xs: 'h-12 min-h-[48px]',
     sm: 'h-16 min-h-[64px]',
-    md: 'h-24 min-h-[96px]',
+    md: 'h-20 min-h-[80px]',
     lg: 'h-32 min-h-[128px]',
     xl: 'h-40 min-h-[160px]'
   };
@@ -28,11 +28,11 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
 
 export function LogoG({ size = 'md', className = '' }: { size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl', className?: string }) {
   const sizeClasses = {
-    xs: 'h-12 min-h-[48px]',
-    sm: 'h-14 min-h-[56px]',
+    xs: 'h-10 min-h-[40px]',
+    sm: 'h-12 min-h-[48px]',
     md: 'h-16 min-h-[64px]',
     lg: 'h-24 min-h-[96px]',
-    xl: 'h-32 min-h-[128px]'
+    xl: 'h-28 min-h-[112px]'
   };
 
   return (

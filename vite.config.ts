@@ -29,6 +29,7 @@ export default defineConfig(({mode}) => {
           description: 'Ordini e Menù Digitale Salumeria Enoteca Gigliola',
           theme_color: '#ffffff',
           background_color: '#ffffff',
+          start_url: '/',
           display: 'standalone',
           icons: [
             {
@@ -41,7 +42,13 @@ export default defineConfig(({mode}) => {
               src: 'app-icon-512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: 'app-icon-512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         }
