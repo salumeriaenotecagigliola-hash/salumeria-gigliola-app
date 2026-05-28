@@ -368,6 +368,17 @@ export default function CustomerInterface(props: Props) {
 
               <div className="mt-auto space-y-3 pt-6 border-t border-brand-black/5">
                 <button 
+                  onClick={() => { 
+                    window.dispatchEvent(new CustomEvent('show-pwa-install')); 
+                    setIsDrawerOpen(false); 
+                  }} 
+                  className="w-full text-left p-4 rounded-2xl bg-brand-black text-brand-gold hover:bg-black transition-colors font-black uppercase tracking-widest text-xs flex items-center justify-between shadow-md border border-brand-gold/25"
+                >
+                  {lang === "it" ? "Installa l'App" : lang === "de" ? "App installieren" : lang === "fr" ? "Installer l'App" : "Install App"} 
+                  <Download size={16} strokeWidth={2.5} />
+                </button>
+
+                <button 
                   onClick={() => { setShowAllergensFAQ(true); setIsDrawerOpen(false); }} 
                   className="w-full text-left p-4 rounded-2xl bg-brand-gold/10 text-brand-black/80 hover:bg-brand-gold hover:text-brand-black transition-colors font-black uppercase tracking-widest text-xs flex items-center justify-between"
                 >
