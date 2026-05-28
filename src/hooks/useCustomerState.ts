@@ -1228,7 +1228,7 @@ export function useCustomerState(props: Props) {
     doc.setFont("helvetica");
 
     const img = new window.Image();
-    img.src = `${import.meta.env.BASE_URL}logo-192.png`;
+    img.src = `${import.meta.env.BASE_URL}gigliola-wide.png`;
 
     await new Promise((resolve) => {
       img.onload = resolve;

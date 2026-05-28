@@ -16,7 +16,7 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
 
   return (
     <img 
-      src={`${import.meta.env.BASE_URL}logo-192.png`}
+      src={`${import.meta.env.BASE_URL}gigliola-wide.png`}
       alt="Enoteca Gigliola"
       className={`w-auto object-contain flex-shrink-0 transition-all duration-300 ${sizeClasses[size]} ${className}`}
     />
