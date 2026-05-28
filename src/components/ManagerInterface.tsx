@@ -59,7 +59,7 @@ import {
 } from "recharts";
 import { motion, AnimatePresence } from "motion/react";
 import { t } from "../lib/i18n";
-import { LogoG } from "./Logo";
+import Logo, { LogoG } from "./Logo";
 import CustomerInterface from "./CustomerInterface";
 import PullToRefresh from "./PullToRefresh";
 
@@ -1334,7 +1334,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
               className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-brand-paper z-[101] shadow-2xl flex flex-col"
             >
               <div className="p-6 border-b border-brand-black/5 flex items-center justify-between">
-                <LogoG size="sm" />
+                <Logo size="md" />
                 <button
                   onClick={() => setIsSidebarOpen(false)}
                   className="p-2 bg-brand-black/5 rounded-full hover:bg-brand-black/10 transition-colors"
@@ -1402,7 +1402,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
           </button>
           
           <div className="hidden sm:block">
-            <LogoG size="sm" />
+            <Logo size="xs" />
           </div>
           
           <div className="hidden sm:block">

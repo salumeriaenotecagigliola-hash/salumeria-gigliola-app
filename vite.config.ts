@@ -8,12 +8,15 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     base: '/',
+    build: {
+      outDir: 'dist',
+    },
     plugins: [
       react(), 
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['logo.png', 'icon.png'],
+        includeAssets: ['logo-192.png', 'logo-512.png', 'app-icon-192.png', 'app-icon-512.png'],
         workbox: {
           maximumFileSizeToCacheInBytes: 5000000, // 5MB
           cleanupOutdatedCaches: true,
@@ -29,16 +32,16 @@ export default defineConfig(({mode}) => {
           display: 'standalone',
           icons: [
             {
-              src: 'icon.png',
-              sizes: '192x192 512x512',
+              src: 'app-icon-192.png',
+              sizes: '192x192',
               type: 'image/png',
               purpose: 'any'
             },
             {
-              src: 'icon.png',
-              sizes: '192x192 512x512',
+              src: 'app-icon-512.png',
+              sizes: '512x512',
               type: 'image/png',
-              purpose: 'maskable'
+              purpose: 'any maskable'
             }
           ]
         }

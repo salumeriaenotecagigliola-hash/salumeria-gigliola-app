@@ -18,7 +18,7 @@ import { t } from "./lib/i18n";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db, auth, loginWithGoogle, logout } from "./lib/firebase";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { LogoG } from "./components/Logo";
+import Logo, { LogoG } from "./components/Logo";
 import { motion, AnimatePresence } from "motion/react";
 import PullToRefresh from "./components/PullToRefresh";
 
@@ -117,8 +117,8 @@ export default function App() {
       {showSettings && (
         <div className="fixed inset-0 z-[110] bg-brand-black/60 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-white p-8 rounded-[3rem] w-full max-w-sm shadow-[0_30px_100px_rgba(0,0,0,0.5)] border border-brand-gold/10">
-            <div className="flex justify-center mb-8">
-              <LogoG size="lg" />
+            <div className="flex justify-center mb-8 px-4">
+              <Logo size="xl" />
             </div>
 
             <div className="pt-8 mx-auto w-full">
