@@ -34,7 +34,7 @@ export function LogoG({ size = 'md', className = '' }: { size?: 'xs' | 'sm' | 'm
 
   return (
     <img 
-      src={`${import.meta.env.BASE_URL}logo-512.png`}
+      src={`${import.meta.env.BASE_URL}app-icon-512.png`}
       alt="G"
       className={`w-auto object-contain flex-shrink-0 transition-all duration-300 ${sizeClasses[size]} ${className}`}
     />
