@@ -21,7 +21,6 @@ import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import Logo from "./components/Logo";
 import { motion, AnimatePresence } from "motion/react";
 import PullToRefresh from "./components/PullToRefresh";
-import PWAInstallHelper from "./components/PWAInstallHelper";
 
 export default function App() {
   const [lang, setLang] = useState<Language>("it");
@@ -87,9 +86,6 @@ export default function App() {
 
   return (
     <div className="min-h-[100dvh] font-sans bg-brand-paper selection:bg-brand-gold selection:text-brand-black pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
-      {/* PWA Install Prompter & Assistant */}
-      <PWAInstallHelper lang={lang} />
-
       {/* Offline Banner */}
       <AnimatePresence>
         {!isOnline && (
