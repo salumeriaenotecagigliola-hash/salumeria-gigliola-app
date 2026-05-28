@@ -7,11 +7,11 @@ interface LogoProps {
 
 export default function Logo({ size = 'md', className = '' }: LogoProps) {
   const sizeClasses = {
-    xs: 'h-10',
-    sm: 'h-12',
-    md: 'h-16',
-    lg: 'h-24',
-    xl: 'h-32'
+    xs: 'h-8',
+    sm: 'h-10',
+    md: 'h-12',
+    lg: 'h-18',
+    xl: 'h-24'
   };
 
   return (
@@ -25,11 +25,11 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
 
 export function LogoG({ size = 'md', className = '' }: { size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl', className?: string }) {
   const sizeClasses = {
-    xs: 'h-8',
-    sm: 'h-10',
-    md: 'h-12',
-    lg: 'h-20',
-    xl: 'h-24'
+    xs: 'h-6',
+    sm: 'h-8',
+    md: 'h-10',
+    lg: 'h-16',
+    xl: 'h-20'
   };
 
   return (
