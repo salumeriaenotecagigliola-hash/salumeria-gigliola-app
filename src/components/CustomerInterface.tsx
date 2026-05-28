@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useCustomerState, getMacroCategory } from "../hooks/useCustomerState";
-import { ShoppingCart, Plus, Minus, Send, ClipboardList, Info, X, Download, Settings, ChevronDown, Menu, Globe, ListChecks, CheckCircle2, ArrowRightLeft, ArrowLeft, ShieldCheck, Bell, MapPin, Clock, Facebook, Instagram, Star } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Send, ClipboardList, Info, X, Download, Settings, ChevronDown, Menu, Globe, ListChecks, CheckCircle2, ArrowRightLeft, ArrowLeft, ShieldCheck, Bell, Search, MapPin, Clock, Facebook, Instagram, Star } from "lucide-react";
 import Logo, { LogoG } from "./Logo";
 import PullToRefresh from "./PullToRefresh";
 import { motion, AnimatePresence } from "motion/react";
@@ -50,7 +50,8 @@ const NON_ALCOHOLIC_OPTIONS = [
   "Acqua Tonica",
   "Crodino",
   "Sanbittèr",
-  "Acqua frizzante/naturale",
+  "Acqua Naturale",
+  "Acqua Frizzante",
 ];
 
 /**
@@ -61,12 +62,25 @@ export default function CustomerInterface(props: Props) {
   const state = useCustomerState(props);
   const {
     lang, setLang, onOpenAdmin, editMode, isManager, onNavigateManager,
-    products,categoriesOriginal,availableMacros,activeMacroCategory,setActiveMacroCategory,hasStoredTakeaway,setHasStoredTakeaway,activeCategoriesOriginal,allCategories,extrasData,setExtrasData,featuredCrossSellProducts,setFeaturedCrossSellProducts,categoryConfig,setCategoryConfig,tableMappings,setTableMappings,getActiveTableNumber,getActiveTableLabel,activeCategory,setActiveCategory,showAllergensFAQ,setShowAllergensFAQ,showCategoryDropdown,setShowCategoryDropdown,isDrawerOpen,setIsDrawerOpen,cart,setCart,tableNumber,setTableNumber,customerName,setCustomerName,customerLastName,setCustomerLastName,customerPhone,setCustomerPhone,isJoined,setIsJoined,customerMode,setCustomerMode,takeawayTime,setTakeawayTime,minTakeawayTimeStr,setMinTakeawayTimeStr,recoveryName,setRecoveryName,recoveryCode,setRecoveryCode,isRecovering,setIsRecovering,recoveredOrder,setRecoveredOrder,recoveryError,setRecoveryError,recoveredOrderId,setRecoveredOrderId,checkingTable,setCheckingTable,orderNotes,setOrderNotes,tableError,setTableError,globalError,setGlobalError,isSubmitting,setIsSubmitting,orderSent,setOrderSent,sentOrderRecap,setSentOrderRecap,sentOrderId,setSentOrderId,isCartOpen,setIsCartOpen,myActiveOrders,setMyActiveOrders,managerWaiter,setManagerWaiter,editingCartIndex,setEditingCartIndex,customerEditingIndex,setCustomerEditingIndex,editCustomerCartItem,cartSubItemName,setCartSubItemName,cartSubItemPrice,setCartSubItemPrice,handleTakeawayConfirm,callWaiterTable,setCallWaiterTable,callWaiterSent,setCallWaiterSent,showCallWaiterModal,setShowCallWaiterModal,isScrolled,setIsScrolled,handleCallWaiter,handleRecoverOrder,handleTableConfirm,selectedProduct,setSelectedProduct,itemNote,setItemNote,specialRequest,setSpecialRequest,weightInfo,setWeightInfo,itemQuantity,setItemQuantity,bowlSize,setBowlSize,bowlBase,setBowlBase,bowlSalume,setBowlSalume,bowlFormaggio,setBowlFormaggio,bowlContorno,setBowlContorno,subItems,setSubItems,subItemName,setSubItemName,subItemPrice,setSubItemPrice,cancelProductModal,handleCustomizationToggle,handleIngredientRemovalToggle,bowlError,setBowlError,isCustomItemOpen,setIsCustomItemOpen,customItemName,setCustomItemName,customItemPrice,setCustomItemPrice,customItemNote,setCustomItemNote,isCustomizing,setIsCustomizing,selectedExtras,setSelectedExtras,removedIngredients,setRemovedIngredients,substitutions,setSubstitutions,inferredBaseIngredients,setInferredBaseIngredients,manualSubstitution,setManualSubstitution,manualExtras,setManualExtras,customExtraInput,setCustomExtraInput,getComputedPrice,isOrderingBlocked,computedPrice,openProductModal,openCustomItemModal,addCustomItemToCart,confirmAddToCart,removeFromCart,generateReceiptPDF,total,isCrossSellModalOpen,setIsCrossSellModalOpen,crossSellSuggestions,setCrossSellSuggestions,handleOrderInitiation,addCrossSellItem,submitOrder,btnClasses,relevantExtras,canCustomize,isTakeawayClosed,takeawayHours,waiterCooldownRemaining
+    products,categoriesOriginal,availableMacros,activeMacroCategory,setActiveMacroCategory,hasStoredTakeaway,setHasStoredTakeaway,activeCategoriesOriginal,allCategories,extrasData,setExtrasData,featuredCrossSellProducts,setFeaturedCrossSellProducts,categoryConfig,setCategoryConfig,tableMappings,setTableMappings,getActiveTableNumber,getActiveTableLabel,activeCategory,setActiveCategory,showAllergensFAQ,setShowAllergensFAQ,showCategoryDropdown,setShowCategoryDropdown,isDrawerOpen,setIsDrawerOpen,cart,setCart,tableNumber,setTableNumber,customerName,setCustomerName,customerLastName,setCustomerLastName,customerPhone,setCustomerPhone,isJoined,setIsJoined,customerMode,setCustomerMode,takeawayTime,setTakeawayTime,minTakeawayTimeStr,setMinTakeawayTimeStr,recoveryName,setRecoveryName,recoveryCode,setRecoveryCode,isRecovering,setIsRecovering,recoveredOrder,setRecoveredOrder,recoveryError,setRecoveryError,recoveredOrderId,setRecoveredOrderId,checkingTable,setCheckingTable,orderNotes,setOrderNotes,tableError,setTableError,globalError,setGlobalError,isSubmitting,setIsSubmitting,orderSent,setOrderSent,sentOrderRecap,setSentOrderRecap,sentOrderId,setSentOrderId,isCartOpen,setIsCartOpen,myActiveOrders,setMyActiveOrders,managerWaiter,setManagerWaiter,editingCartIndex,setEditingCartIndex,customerEditingIndex,setCustomerEditingIndex,editCustomerCartItem,cartSubItemName,setCartSubItemName,cartSubItemPrice,setCartSubItemPrice,handleTakeawayConfirm,callWaiterTable,setCallWaiterTable,callWaiterSent,setCallWaiterSent,showCallWaiterModal,setShowCallWaiterModal,isScrolled,setIsScrolled,handleCallWaiter,handleRecoverOrder,handleTableConfirm,selectedProduct,setSelectedProduct,itemNote,setItemNote,specialRequest,setSpecialRequest,weightInfo,setWeightInfo,itemQuantity,setItemQuantity,bowlSize,setBowlSize,bowlBase,setBowlBase,bowlSalume,setBowlSalume,bowlFormaggio,setBowlFormaggio,bowlContorno,setBowlContorno,subItems,setSubItems,subItemName,setSubItemName,subItemPrice,setSubItemPrice,cancelProductModal,handleCustomizationToggle,handleIngredientRemovalToggle,bowlError,setBowlError,isCustomItemOpen,setIsCustomItemOpen,customItemName,setCustomItemName,customItemPrice,setCustomItemPrice,customItemNote,setCustomItemNote,isCustomizing,setIsCustomizing,selectedExtras,setSelectedExtras,removedIngredients,setRemovedIngredients,substitutions,setSubstitutions,inferredBaseIngredients,setInferredBaseIngredients,manualSubstitution,setManualSubstitution,manualExtras,setManualExtras,customExtraInput,setCustomExtraInput,getComputedPrice,isOrderingBlocked,computedPrice,openProductModal,openCustomItemModal,addCustomItemToCart,confirmAddToCart,removeFromCart,generateReceiptPDF,total,isCrossSellModalOpen,setIsCrossSellModalOpen,crossSellSuggestions,setCrossSellSuggestions,handleOrderInitiation,addCrossSellItem,submitOrder,btnClasses,relevantExtras,canCustomize,isTakeawayClosed,takeawayHours,waiterCooldownRemaining,customerOrdersSettings
   } = state;
 
   const [missingTableError, setMissingTableError] = useState(false);
   const [closedWarningDismissed, setClosedWarningDismissed] = useState(false);
   const [expandedExtraCategory, setExpandedExtraCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  // Derive search results
+  const searchResults = React.useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return products.filter(p => !p.isHidden && (
+      p.name.it.toLowerCase().includes(q) || 
+      (p.name.en?.toLowerCase().includes(q)) || 
+      (p.description?.it?.toLowerCase().includes(q))
+    )).slice(0, 10);
+  }, [searchQuery, products]);
 
   const allergenInteraction = useAllergenInteraction(() => setShowAllergensFAQ(true));
 
@@ -301,19 +315,23 @@ export default function CustomerInterface(props: Props) {
                     >
                       {t("viewMenuBtn", lang)}
                     </button>
-                    <button 
-                      onClick={() => { setCustomerMode("orderTable"); setIsDrawerOpen(false); }} 
-                      className={`w-full text-left p-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all ${customerMode === "orderTable" ? "bg-brand-black text-brand-gold shadow-lg" : "bg-white hover:bg-brand-gold/10 text-brand-black/70 hover:text-brand-black border border-brand-black/5"}`}
-                    >
-                      {t("orderTableBtn", lang)}
-                    </button>
-                    <button 
-                      onClick={() => { setCustomerMode("takeaway"); setIsDrawerOpen(false); }} 
-                      className={`w-full text-left p-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all ${customerMode === "takeaway" ? "bg-brand-black text-brand-gold shadow-lg" : "bg-white hover:bg-brand-gold/10 text-brand-black/70 hover:text-brand-black border border-brand-black/5"}`}
-                    >
-                      {t("takeawayBtn", lang)}
-                    </button>
-                    {(customerMode === "menuOnly" || customerMode === "orderTable") && (
+                    {customerOrdersSettings.allowTableOrders !== false && (
+                      <button 
+                        onClick={() => { setCustomerMode("orderTable"); setIsDrawerOpen(false); }} 
+                        className={`w-full text-left p-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all ${customerMode === "orderTable" ? "bg-brand-black text-brand-gold shadow-lg" : "bg-white hover:bg-brand-gold/10 text-brand-black/70 hover:text-brand-black border border-brand-black/5"}`}
+                      >
+                        {t("orderTableBtn", lang)}
+                      </button>
+                    )}
+                    {customerOrdersSettings.allowTakeawayOrders !== false && (
+                      <button 
+                        onClick={() => { setCustomerMode("takeaway"); setIsDrawerOpen(false); }} 
+                        className={`w-full text-left p-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all ${customerMode === "takeaway" ? "bg-brand-black text-brand-gold shadow-lg" : "bg-white hover:bg-brand-gold/10 text-brand-black/70 hover:text-brand-black border border-brand-black/5"}`}
+                      >
+                        {t("takeawayBtn", lang)}
+                      </button>
+                    )}
+                    {(!customerOrdersSettings || customerOrdersSettings.allowCallWaiter !== false) && (customerMode === "menuOnly" || customerMode === "orderTable") && (
                       <button 
                         onClick={() => { setShowCallWaiterModal(true); setIsDrawerOpen(false); }} 
                         className={`w-full text-left p-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all ${showCallWaiterModal ? "bg-amber-100 text-amber-900 border border-amber-300" : "bg-white hover:bg-amber-50 text-brand-black/70 hover:text-amber-900 border border-brand-black/5"}`}
@@ -472,12 +490,18 @@ export default function CustomerInterface(props: Props) {
             <>
               <h2 className="text-2xl font-serif text-center font-bold mb-4">{t("welcome", lang)}</h2>
               <button onClick={() => { setCustomerMode("menuOnly"); setIsJoined(true); }} className="p-4 mb-8 bg-white border border-brand-black/10 text-brand-black rounded-2xl font-black uppercase tracking-widest hover:bg-brand-paper hover:scale-[1.02] active:scale-95 transition-all shadow-sm">{t("viewMenuBtn", lang)}</button>
-              <button onClick={() => setCustomerMode("orderTable")} className="p-4 mb-3 bg-white border border-brand-black/10 text-brand-black rounded-2xl font-black uppercase tracking-widest hover:bg-brand-paper hover:scale-[1.02] active:scale-95 transition-all shadow-sm">{t("orderTableBtn", lang)}</button>
-              <button onClick={() => setCustomerMode("takeaway")} className="p-4 mb-3 bg-white border border-brand-black/10 text-brand-black rounded-2xl font-black uppercase tracking-widest hover:bg-brand-paper hover:scale-[1.02] active:scale-95 transition-all shadow-sm">{t("takeawayBtn", lang)}</button>
-              <div className="h-px bg-brand-black/5 my-4" />
-              <button onClick={() => { setCustomerMode("takeaway"); setRecoveryError(""); }} className="p-4 bg-brand-paper border border-brand-black/10 text-brand-black/60 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-brand-black/5 active:scale-95 transition-all flex items-center justify-center gap-2">
-                <ClipboardList size={16} /> {t("recoverOrderBtn", lang)}
-              </button>
+              {(!customerOrdersSettings || customerOrdersSettings.allowTableOrders) && (
+                <button onClick={() => setCustomerMode("orderTable")} className="p-4 mb-3 bg-white border border-brand-black/10 text-brand-black rounded-2xl font-black uppercase tracking-widest hover:bg-brand-paper hover:scale-[1.02] active:scale-95 transition-all shadow-sm">{t("orderTableBtn", lang)}</button>
+              )}
+              {(!customerOrdersSettings || customerOrdersSettings.allowTakeawayOrders) && (
+                <>
+                  <button onClick={() => setCustomerMode("takeaway")} className="p-4 mb-3 bg-white border border-brand-black/10 text-brand-black rounded-2xl font-black uppercase tracking-widest hover:bg-brand-paper hover:scale-[1.02] active:scale-95 transition-all shadow-sm">{t("takeawayBtn", lang)}</button>
+                  <div className="h-px bg-brand-black/5 my-4" />
+                  <button onClick={() => { setCustomerMode("takeaway"); setRecoveryError(""); }} className="p-4 bg-brand-paper border border-brand-black/10 text-brand-black/60 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-brand-black/5 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <ClipboardList size={16} /> {t("recoverOrderBtn", lang)}
+                  </button>
+                </>
+              )}
             </>
           )}
         </div>
@@ -1098,13 +1122,72 @@ export default function CustomerInterface(props: Props) {
           )}
 
           {isManager && (
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-4 mb-2">
               <button
                 onClick={openCustomItemModal}
                 className="bg-brand-gold text-brand-black px-6 py-3 rounded-full font-black uppercase tracking-widest text-xs shadow-lg active:scale-95 flex items-center gap-2"
               >
                 <Plus size={16} /> {t("addCustomBtn", lang)}
               </button>
+            </div>
+          )}
+
+          {/* Search Bar */}
+          {(isManager || customerMode !== "menuOnly") && (
+            <div className={`relative px-1 ${isScrolled ? "hidden" : "mb-6"}`}>
+              <div className={`flex items-center bg-white border ${searchFocused ? "border-brand-gold shadow-md" : "border-brand-black/10 shadow-sm"} rounded-2xl px-4 py-3 transition-all relative z-40`}>
+                <Search size={20} className="text-brand-black/40 min-w-5 mr-3" />
+                <input 
+                  type="text" 
+                  placeholder={t("searchProducts", lang)} 
+                  className="w-full bg-transparent outline-none text-brand-black font-medium"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery("")} className="text-brand-black/40 hover:text-brand-black p-1 ml-2">
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+
+              {/* Search Suggestions Dropdown */}
+              <AnimatePresence>
+                {searchFocused && searchQuery.trim() && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white border border-brand-black/10 rounded-2xl shadow-xl z-50 max-h-[300px] overflow-y-auto"
+                  >
+                    {searchResults.length > 0 ? (
+                      <div className="flex flex-col py-2">
+                        {searchResults.map(p => (
+                          <button
+                            key={p.id}
+                            onClick={() => {
+                              setSearchQuery("");
+                              setSearchFocused(false);
+                              openProductModal(p);
+                            }}
+                            className="flex flex-col text-left px-5 py-3 hover:bg-brand-paper transition-all active:bg-brand-black/5 border-b border-brand-black/5 last:border-0"
+                          >
+                            <span className="font-bold text-brand-black text-base">{p.name[lang] || p.name.it}</span>
+                            <span className="text-brand-black/40 text-[10px] uppercase font-black tracking-widest mt-0.5">{p.category[lang] || p.category.it}</span>
+                            <span className="text-brand-black/70 text-sm mt-1 font-medium">€ {p.price.toFixed(2)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="px-5 py-6 text-center text-brand-black/40 text-sm italic font-bold">
+                        {t("noProductsFound", lang)}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
 
@@ -1821,11 +1904,7 @@ export default function CustomerInterface(props: Props) {
                     addCustomItemToCart();
                     setIsCustomItemOpen(false);
                   }}
-                  disabled={
-                    !customItemName.trim() ||
-                    !customItemPrice.trim() ||
-                    isNaN(parseFloat(customItemPrice))
-                  }
+                  disabled={!customItemName.trim()}
                   className="w-full bg-brand-black text-brand-gold px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all disabled:opacity-50"
                 >
                   {customerEditingIndex !== null ? "Aggiorna Scelte" : t("addAndClose", lang)}
@@ -1839,11 +1918,7 @@ export default function CustomerInterface(props: Props) {
                       setCustomItemPrice("");
                       setCustomItemNote("");
                     }}
-                    disabled={
-                      !customItemName.trim() ||
-                      !customItemPrice.trim() ||
-                      isNaN(parseFloat(customItemPrice))
-                    }
+                    disabled={!customItemName.trim()}
                     className="w-full bg-brand-gold/20 text-brand-gold-dark px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-inner active:scale-95 transition-all disabled:opacity-50"
                   >
                     {t("addAndNext", lang)}
@@ -2490,7 +2565,7 @@ export default function CustomerInterface(props: Props) {
       </AnimatePresence></Portal>
 
       {/* Floating Call Waiter Button */}
-      {(customerMode === "menuOnly" || customerMode === "orderTable") && !editMode && !isManager && (
+      {(!customerOrdersSettings || customerOrdersSettings.allowCallWaiter !== false) && (customerMode === "menuOnly" || customerMode === "orderTable") && !editMode && !isManager && (
         <button
           onClick={() => setShowCallWaiterModal(true)}
           className={`fixed right-4 z-[45] bg-brand-gold text-brand-black w-14 h-14 rounded-full shadow-[0_10px_25px_rgba(0,0,0,0.3)] flex items-center justify-center active:scale-95 transition-all outline outline-4 outline-white hover:scale-105 ${

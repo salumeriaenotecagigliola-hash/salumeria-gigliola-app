@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { getMenu } from "../lib/menuService";
-import { generateReceiptPdfBlob } from "../lib/pdfExport";
+import { generateReceiptPdfBlob, generateFullOrderReceiptPdf } from "../lib/pdfExport";
 import { Order, OrderStatus, Language } from "../types";
 import CustomizationManager from "./CustomizationManager";
 import CrossSellingManager from "./CrossSellingManager";
@@ -44,7 +44,8 @@ import {
   Share2,
   Lock as LockIcon,
   CreditCard,
-  Landmark
+  Landmark,
+  Download
 } from "lucide-react";
 import {
   BarChart,
@@ -252,7 +253,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   await updateDoc(doc(db, "orders", id), {
                       status: "paid",
                       paymentGroupId: paymentGroupId,
-                      paidAmount: 999999, // Hack: indicate full payment
+                      paidAmount: docSnap.exists() ? docSnap.data().total : 999999,
                       updatedAt: serverTimestamp(),
                       payments: [...oldPayments, orderPaymentRecord]
                   });
@@ -353,7 +354,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
           if (!paymentToDelete) return;
 
           const updatedPayments = payments.filter(p => p.id !== paymentId);
-          const newPaidAmount = Math.max(0, (paymentOrder.paidAmount || 0) - paymentToDelete.amount);
+          const newPaidAmount = paymentOrder.paidAmount > 900000 ? 0 : Math.max(0, (paymentOrder.paidAmount || 0) - paymentToDelete.amount);
           
           let romanaUpdate: any = {};
           if (paymentToDelete.isRomana && paymentOrder.romana) {
@@ -535,6 +536,9 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
   const [isSavingHours, setIsSavingHours] = useState(false);
   const [newOrderAlert, setNewOrderAlert] = useState<Order | null>(null);
   const [newCallAlert, setNewCallAlert] = useState<any | null>(null);
+  const [customerOrdersSettings, setCustomerOrdersSettings] = useState({ allowTableOrders: true, allowTakeawayOrders: true, allowCallWaiter: true });
+  const [localCustomerOrdersSettings, setLocalCustomerOrdersSettings] = useState({ allowTableOrders: true, allowTakeawayOrders: true, allowCallWaiter: true });
+  const [isSavingCustomerOrdersSettings, setIsSavingCustomerOrdersSettings] = useState(false);
 
   const prevOrdersRef = useRef<Order[]>([]);
 
@@ -576,10 +580,27 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
         console.error("Security snapshot error:", err);
     });
 
+    // 4. Listener for customer orders settings
+    const unsubCustomerOrders = onSnapshot(doc(db, "settings", "customerOrders"), (snap) => {
+        if (snap.exists()) {
+            const data = snap.data();
+            const s = {
+                allowTableOrders: data.allowTableOrders !== false,
+                allowTakeawayOrders: data.allowTakeawayOrders !== false,
+                allowCallWaiter: data.allowCallWaiter !== false
+            };
+            setCustomerOrdersSettings(s);
+            setLocalCustomerOrdersSettings(s);
+        }
+    }, (err) => {
+        console.error("Customer orders settings snapshot error:", err);
+    });
+
     return () => {
         unsubMappings();
         unsubHours();
         unsubSecurity();
+        unsubCustomerOrders();
     };
   }, []); // Stable effect for settings listeners
 
@@ -1015,6 +1036,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
     } else if (filter === ("deleted" as any)) {
       result = orders.filter((o) => o.status === "cancelled");
     } else if (filter === "pending") {
+      // Pending is merged into toDeliver now, no longer a standalone button, but keep for fallback
       orders.forEach(o => {
         const splits = splitOrderByStatus(o);
         const match = splits.find(s => s.status === "pending");
@@ -1023,8 +1045,10 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
     } else if (filter === ("toDeliver" as any)) {
       orders.forEach(o => {
         const splits = splitOrderByStatus(o);
-        const match = splits.find(s => s.status === "preparing");
-        if (match) result.push(match);
+        const pendingMatch = splits.find(s => s.status === "pending");
+        const preparingMatch = splits.find(s => s.status === "preparing");
+        if (pendingMatch) result.push(pendingMatch);
+        if (preparingMatch) result.push(preparingMatch);
       });
     } else if (filter === "served") {
        orders.forEach(o => {
@@ -1241,7 +1265,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
               : "MODALITÀ CAMERIERE"}
           </div>
         </header>
-        <div className="bg-brand-paper rounded-[3rem] border-2 border-dashed border-brand-gold/30 p-2 min-h-screen">
+        <div className="bg-brand-paper rounded-[3rem] border-2 border-dashed border-brand-gold/30 p-2 min-h-[100dvh]">
           {managerView === "takeOrder" ? (
             <div key={takeOrderKey} className="h-full">
               <CustomerInterface
@@ -1900,6 +1924,68 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
 
                 <div className="bg-brand-paper p-4 sm:p-6 rounded-[1.5rem] sm:rounded-3xl border border-brand-black/5 shadow-inner">
                     <label className="block text-[10px] uppercase font-black tracking-widest text-brand-black/40 mb-4 px-2">
+                        Funzioni Ordini Clienti
+                    </label>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-brand-black/5">
+                            <span className="font-bold text-sm">Ordini dal Tavolo (da cliente)</span>
+                            <button
+                                onClick={() => {
+                                    setLocalCustomerOrdersSettings(prev => ({ ...prev, allowTableOrders: !prev.allowTableOrders }));
+                                }}
+                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${!localCustomerOrdersSettings.allowTableOrders ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}
+                            >
+                                {localCustomerOrdersSettings.allowTableOrders ? "ATTIVO" : "DISATTIVATO"}
+                            </button>
+                        </div>
+                        <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-brand-black/5">
+                            <span className="font-bold text-sm">Ordini da Asporto (da cliente)</span>
+                            <button
+                                onClick={() => {
+                                    setLocalCustomerOrdersSettings(prev => ({ ...prev, allowTakeawayOrders: !prev.allowTakeawayOrders }));
+                                }}
+                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${!localCustomerOrdersSettings.allowTakeawayOrders ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}
+                            >
+                                {localCustomerOrdersSettings.allowTakeawayOrders ? "ATTIVO" : "DISATTIVATO"}
+                            </button>
+                        </div>
+                        <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-brand-black/5">
+                            <span className="font-bold text-sm">Chiama Cameriere (da cliente)</span>
+                            <button
+                                onClick={() => {
+                                    setLocalCustomerOrdersSettings(prev => ({ ...prev, allowCallWaiter: !prev.allowCallWaiter }));
+                                }}
+                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${!localCustomerOrdersSettings.allowCallWaiter ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}
+                            >
+                                {localCustomerOrdersSettings.allowCallWaiter ? "ATTIVO" : "DISATTIVATO"}
+                            </button>
+                        </div>
+                    </div>
+                    <div className="mt-4">
+                        <button
+                            disabled={isSavingCustomerOrdersSettings}
+                            onClick={async () => {
+                                setIsSavingCustomerOrdersSettings(true);
+                                try {
+                                    await setDoc(doc(db, "settings", "customerOrders"), localCustomerOrdersSettings);
+                                    alert("Impostazioni ordini salvate correttamente!");
+                                } catch (e) {
+                                    console.error("Errore salvataggio impostazioni ordini:", e);
+                                    alert("Errore durante il salvataggio.");
+                                } finally {
+                                    setIsSavingCustomerOrdersSettings(false);
+                                }
+                            }}
+                            className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-sm hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30 flex items-center justify-center gap-2 ${JSON.stringify(customerOrdersSettings) === JSON.stringify(localCustomerOrdersSettings) ? "bg-white text-brand-black/40 border border-brand-black/5" : "bg-brand-black text-brand-gold"}`}
+                        >
+                            {isSavingCustomerOrdersSettings ? <RefreshCw size={14} className="animate-spin" /> : null}
+                            Salva Impostazioni Ordini
+                        </button>
+                    </div>
+                </div>
+
+                <div className="bg-brand-paper p-4 sm:p-6 rounded-[1.5rem] sm:rounded-3xl border border-brand-black/5 shadow-inner">
+                    <label className="block text-[10px] uppercase font-black tracking-widest text-brand-black/40 mb-4 px-2">
                         Orari Apertura Asporto
                     </label>
                     <div className="space-y-4">
@@ -2089,12 +2175,11 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
         </div>
       ) : (
         <>
-          <div className="mb-8 grid grid-cols-2 md:grid-cols-6 gap-2 bg-brand-paper p-1.5 rounded-2xl shadow-inner border border-brand-black/5 overflow-hidden">
+          <div className="mb-8 grid grid-cols-2 md:grid-cols-5 gap-2 bg-brand-paper p-1.5 rounded-2xl shadow-inner border border-brand-black/5 overflow-hidden">
             {[
               { id: "all", label: "🔥 Attivi", count: categoryCounts.all },
-              { id: "pending", label: "🕐 In attesa", count: categoryCounts.pending },
-              { id: "toDeliver", label: "🏃 In prep.", count: categoryCounts.toDeliver },
-              { id: "served", label: "✅ Al Tavolo", count: categoryCounts.served },
+              { id: "toDeliver", label: "🏃 In preparazione", count: categoryCounts.pending + categoryCounts.toDeliver },
+              { id: "served", label: "✅ Serviti", count: categoryCounts.served },
               { id: "paid", label: "💰 Pagati", count: categoryCounts.paid },
               { id: "deleted", label: "🗑️ Eliminati", count: categoryCounts.deleted },
             ].map((s) => (
@@ -2203,7 +2288,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   {filteredOrders.filter(o => o.status !== "linked").map(order => {
                       const isPending = order.items.some(i => (i as any).originStatus === 'pending' || (!(i as any).originStatus && order.status === 'pending'));
                       const isPreparing = order.items.some(i => (i as any).originStatus === 'preparing' || (!(i as any).originStatus && order.status === 'preparing'));
-                      const statusMsg = order.status === "cancelled" ? "ANNULLATO" : order.status === "paid" ? "PAGATO" : order.status === "delivered" ? "CONSEGNATO" : isPending ? "IN ATTESA" : isPreparing ? "IN PREP." : "SERVITO";
+                      const statusMsg = order.status === "cancelled" ? "ANNULLATO" : order.status === "paid" ? "PAGATO" : order.status === "delivered" ? "CONSEGNATO" : isPending ? "IN ATTESA" : isPreparing ? "IN PREPARAZIONE" : "SERVITO";
                       
                       return (
                       <div key={`${order.id}-${order.status}`} className="bg-brand-paper p-6 rounded-3xl shadow-sm border border-brand-black/5 flex flex-col items-center justify-center text-center hover:border-brand-gold transition-all hover:-translate-y-1 cursor-pointer" onClick={() => setViewingTableOrder(order)}>
@@ -2378,8 +2463,8 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                       }`}
                     >
                         <option value="pending">IN ATTESA</option>
-                        <option value="preparing">IN PREP.</option>
-                        <option value="served">DELIVERED</option>
+                        <option value="preparing">IN PREPARAZIONE</option>
+                        <option value="served">SERVITO</option>
                         <option value="paid">PAGATO</option>
                         <option value="cancelled">ANNULLATO</option>
                     </select>
@@ -2501,16 +2586,27 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                          </button>
                        )}
                        {(order.status === "paid" || order.status === "delivered") && (
-                         <button
-                           onClick={() => {
-                             const originalOrder = (order as any).originalGroupedOrder || orders.find(o => o.id === order.id) || order;
-                             setPaymentOrder(originalOrder);
-                             setSelectedItemsForPayment([]);
-                           }}
-                           className="w-full bg-brand-gold text-brand-black py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all border border-brand-black/10"
-                         >
-                           <ClipboardList size={20} /> STORICO PAGAMENTI
-                         </button>
+                         <>
+                           <button
+                             onClick={() => {
+                               const originalOrder = (order as any).originalGroupedOrder || orders.find(o => o.id === order.id) || order;
+                               setPaymentOrder(originalOrder);
+                               setSelectedItemsForPayment([]);
+                             }}
+                             className="w-full bg-brand-gold text-brand-black py-5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all border border-brand-black/10"
+                           >
+                             <ClipboardList size={20} /> STORICO PAGAMENTI
+                           </button>
+                           <button
+                             onClick={async () => {
+                               const originalOrder = (order as any).originalGroupedOrder || orders.find(o => o.id === order.id) || order;
+                               await generateFullOrderReceiptPdf(originalOrder);
+                             }}
+                             className="w-full mt-2 bg-brand-black/5 text-brand-black/60 hover:text-brand-black hover:bg-brand-black/10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-colors"
+                           >
+                             <Download size={20} /> SCARICA RICEVUTA PDF
+                           </button>
+                         </>
                        )}
                     </div>
 
@@ -2632,7 +2728,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   Già Pagato
                 </p>
                 <p className="font-mono text-base sm:text-2xl lg:text-3xl font-black text-green-700">
-                  € {(paymentOrder.paidAmount || 0).toFixed(2)}
+                  € {(paymentOrder.paidAmount > 900000 ? paymentOrder.total : (paymentOrder.paidAmount || 0)).toFixed(2)}
                 </p>
               </div>
               <div className="text-right flex flex-col items-end min-w-0 pl-2">
@@ -2640,7 +2736,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   Da Pagare
                 </p>
                 <p className="font-mono text-base sm:text-2xl lg:text-3xl font-black text-red-600">
-                  € {Math.max(0, paymentOrder.total - (paymentOrder.paidAmount || 0)).toFixed(2)}
+                  € {Math.max(0, paymentOrder.total - (paymentOrder.paidAmount > 900000 ? paymentOrder.total : (paymentOrder.paidAmount || 0))).toFixed(2)}
                 </p>
               </div>
             </div>
@@ -2692,7 +2788,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   €{" "}
                   {Math.max(
                     0,
-                    paymentOrder.total - (paymentOrder.paidAmount || 0),
+                    paymentOrder.total - (paymentOrder.paidAmount > 900000 ? paymentOrder.total : (paymentOrder.paidAmount || 0)),
                   ).toFixed(2)}
                 </p>
                 <button
@@ -2700,7 +2796,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                     setPendingPayment({
                       amount: Math.max(
                         0,
-                        paymentOrder.total - (paymentOrder.paidAmount || 0),
+                        paymentOrder.total - (paymentOrder.paidAmount > 900000 ? paymentOrder.total : (paymentOrder.paidAmount || 0)),
                       ),
                       items: [],
                     })
@@ -2785,7 +2881,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                     </div>
                     
                     {(() => {
-                      const remainingAmount = Math.max(0, paymentOrder.total - (paymentOrder.paidAmount || 0));
+                      const remainingAmount = Math.max(0, paymentOrder.total - (paymentOrder.paidAmount > 900000 ? paymentOrder.total : (paymentOrder.paidAmount || 0)));
                       const valQuota = remainingAmount / splitCount;
 
                       return (
@@ -2958,7 +3054,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
               </div>
             )}
 
-            {Math.max(0, paymentOrder.total - (paymentOrder.paidAmount || 0)) >
+            {Math.max(0, paymentOrder.total - (paymentOrder.paidAmount > 900000 ? paymentOrder.total : (paymentOrder.paidAmount || 0))) >
               0 && (
               <div className="mt-6 flex justify-end">
                 <button
@@ -2966,7 +3062,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                     setPendingPayment({
                       amount: Math.max(
                         0,
-                        paymentOrder.total - (paymentOrder.paidAmount || 0),
+                        paymentOrder.total - (paymentOrder.paidAmount > 900000 ? paymentOrder.total : (paymentOrder.paidAmount || 0)),
                       ),
                       items: [],
                     })
@@ -2974,6 +3070,22 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   className="w-full sm:w-auto justify-center bg-green-600 text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 shadow-xl hover:bg-green-500 active:scale-95 transition-all text-center"
                 >
                   <CheckCircle2 size={18} /> SALDA INTERO RIMANENTE
+                </button>
+              </div>
+            )}
+
+            {Math.max(0, paymentOrder.total - (paymentOrder.paidAmount > 900000 ? paymentOrder.total : (paymentOrder.paidAmount || 0))) <= 0 && (
+              <div className="mt-8 border-2 border-brand-black/10 bg-brand-black/5 p-6 lg:p-8 rounded-[2rem] flex flex-col items-center gap-4 text-center">
+                 <CheckCircle2 size={48} className="text-green-600 mb-2" />
+                 <h3 className="text-2xl font-serif font-black text-brand-black">Ordine Saldato</h3>
+                 <p className="text-xs font-black uppercase tracking-widest text-brand-black/40 mb-2">L'ordine è stato incassato interamente.</p>
+                 <button
+                  onClick={async () => {
+                     await generateFullOrderReceiptPdf(paymentOrder);
+                  }}
+                  className="w-full sm:w-auto px-8 py-5 bg-brand-black text-brand-gold rounded-2xl font-black text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-3 shadow-lg hover:shadow-xl active:scale-95"
+                >
+                  <Download size={20} /> Scarica Ricevuta Completa
                 </button>
               </div>
             )}
@@ -3159,7 +3271,7 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
               <ul className="space-y-3">
                  {viewingTableOrder.items.map((item, idx) => {
                     const itemStatus = (item as any).originStatus || viewingTableOrder.status;
-                    const statusStr = itemStatus === 'pending' ? 'IN ATTESA' : itemStatus === 'preparing' ? 'IN PREP.' : 'SERVITO';
+                    const statusStr = itemStatus === 'pending' ? 'IN ATTESA' : itemStatus === 'preparing' ? 'IN PREPARAZIONE' : 'SERVITO';
                     const statusColor = itemStatus === 'pending' ? 'text-amber-700 bg-amber-100' : itemStatus === 'preparing' ? 'text-amber-600 bg-amber-50' : 'text-green-700 bg-green-100';
 
                     return (
@@ -3211,6 +3323,16 @@ export default function ManagerInterface({ lang, user, onLogout, minPrepTime, on
                   className="w-full py-4 bg-brand-black text-brand-gold rounded-xl font-black text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-95"
                 >
                   <Receipt size={16} /> Gestisci Pagamento
+                </button>
+              )}
+              {(viewingTableOrder.status === 'paid' || viewingTableOrder.status === 'delivered') && (
+                <button
+                  onClick={async () => {
+                     await generateFullOrderReceiptPdf(viewingTableOrder);
+                  }}
+                  className="w-full py-4 bg-brand-black/5 text-brand-black/60 hover:text-brand-black hover:bg-brand-black/10 rounded-xl font-black text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                >
+                  <Download size={16} /> Scarica Ricevuta PDF
                 </button>
               )}
             </div>

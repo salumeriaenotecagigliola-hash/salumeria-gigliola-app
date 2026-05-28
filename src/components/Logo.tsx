@@ -16,7 +16,7 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
   return (
     <div className={`flex items-center justify-center flex-shrink-0 transition-all duration-300 ${sizeClasses[size]} ${className}`}>
       <img 
-        src="/unnamed.png" 
+        src={`${import.meta.env.BASE_URL}logo-192.png`}
         alt="Enoteca Gigliola" 
         className="h-full w-auto object-contain block max-w-full transition-all duration-300" 
         style={{ height: '100%' }}
@@ -36,7 +36,7 @@ export function LogoG({ size = 'md', className = '' }: { size?: 'xs' | 'sm' | 'm
   return (
     <div className={`flex items-center justify-center flex-shrink-0 transition-all duration-300 ${sizeClasses[size]} ${className}`}>
       <img 
-        src="/unnamed.png" 
+        src={`${import.meta.env.BASE_URL}logo-512.png`}
         alt="G" 
         className="h-full w-auto object-contain block max-w-full transition-all duration-300" 
         style={{ height: '100%' }}

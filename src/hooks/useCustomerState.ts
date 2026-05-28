@@ -76,7 +76,8 @@ const NON_ALCOHOLIC_OPTIONS = [
   "Acqua Tonica",
   "Crodino",
   "Sanbittèr",
-  "Acqua frizzante/naturale",
+  "Acqua Naturale",
+  "Acqua Frizzante",
 ];
 
 const inferIngredients = (description: string, extras: Extra[]): { name: string; category: string }[] => {
@@ -202,11 +203,26 @@ export function useCustomerState(props: Props) {
   }, [categoriesOriginal]);
 
   const [takeawayHours, setTakeawayHours] = useState<any>(null);
+  const [customerOrdersSettings, setCustomerOrdersSettings] = useState({ allowTableOrders: true, allowTakeawayOrders: true, allowCallWaiter: true });
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "settings", "takeawayHours"), (snap) => {
       if (snap.exists()) {
         setTakeawayHours(snap.data());
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "settings", "customerOrders"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setCustomerOrdersSettings({
+          allowTableOrders: data.allowTableOrders !== false,
+          allowTakeawayOrders: data.allowTakeawayOrders !== false,
+          allowCallWaiter: data.allowCallWaiter !== false
+        });
       }
     });
     return () => unsub();
@@ -669,6 +685,10 @@ export function useCustomerState(props: Props) {
   }, [callWaiterTable, tableNumber]);
 
   const handleCallWaiter = async () => {
+    if (customerOrdersSettings.allowCallWaiter === false) {
+      setTableError("Il servizio di chiamata è temporaneamente disattivato.");
+      return;
+    }
     const val = parseInt(callWaiterTable, 10);
     if (!(val >= 1 && val <= 10)) {
       setTableError("Inserisci un numero di tavolo valido (1-10)");
@@ -1005,13 +1025,12 @@ export function useCustomerState(props: Props) {
   };
 
   const addCustomItemToCart = () => {
-    if (
-      !customItemName.trim() ||
-      !customItemPrice.trim() ||
-      isNaN(parseFloat(customItemPrice))
-    ) {
+    if (!customItemName.trim()) {
       return;
     }
+
+    const price = customItemPrice.trim() ? parseFloat(customItemPrice) : 0;
+    if (isNaN(price)) return;
 
     setCart((prev) => {
       if (customerEditingIndex !== null) {
@@ -1020,7 +1039,7 @@ export function useCustomerState(props: Props) {
          updatedCart[customerEditingIndex] = {
            ...existingItem,
            name: customItemName,
-           price: parseFloat(customItemPrice),
+           price: price,
            notes: customItemNote,
          };
          return updatedCart;
@@ -1028,7 +1047,7 @@ export function useCustomerState(props: Props) {
       const newItem: OrderItem = {
         productId: `custom-${customItemName.replace(/\s+/g, "-").toLowerCase()}-${Date.now()}`,
         name: customItemName,
-        price: parseFloat(customItemPrice),
+        price: price,
         quantity: 1,
         notes: customItemNote,
       };
@@ -1199,7 +1218,7 @@ export function useCustomerState(props: Props) {
     doc.setFont("helvetica");
 
     const img = new window.Image();
-    img.src = "/unnamed.png";
+    img.src = `${import.meta.env.BASE_URL}logo-192.png`;
 
     await new Promise((resolve) => {
       img.onload = resolve;
@@ -1419,6 +1438,17 @@ export function useCustomerState(props: Props) {
       return;
     }
 
+    if (!isManager) {
+      if (isTakeaway && customerOrdersSettings.allowTakeawayOrders === false) {
+        setGlobalError("Gli ordini da asporto sono temporaneamente disattivati.");
+        return;
+      }
+      if (!isTakeaway && customerOrdersSettings.allowTableOrders === false) {
+        setGlobalError("Gli ordini dal tavolo sono temporaneamente disattivati.");
+        return;
+      }
+    }
+
     if (isTakeawayClosed && !isManager && isTakeaway) {
       setGlobalError("Siamo spiacenti, gli ordini da asporto non sono disponibili per l'orario richiesto. Verifica gli orari di apertura o scegli un altro orario.");
       return;
@@ -1622,6 +1652,6 @@ export function useCustomerState(props: Props) {
 
   return {
     lang, setLang, onOpenAdmin, editMode, isManager, minPrepTime, onNavigateManager, initialCart, initialTable, initialNotes, orderId, onEditComplete,
-    products,categoriesOriginal,availableMacros,activeMacroCategory,setActiveMacroCategory,hasStoredTakeaway,setHasStoredTakeaway,activeCategoriesOriginal,allCategories,extrasData,setExtrasData,featuredCrossSellProducts,setFeaturedCrossSellProducts,categoryConfig,setCategoryConfig,tableMappings,setTableMappings,getActiveTableNumber,getActiveTableLabel,activeCategory,setActiveCategory,showAllergensFAQ,setShowAllergensFAQ,showCategoryDropdown,setShowCategoryDropdown,isDrawerOpen,setIsDrawerOpen,cart,setCart,tableNumber,setTableNumber,customerName,setCustomerName,customerLastName,setCustomerLastName,customerPhone,setCustomerPhone,isJoined,setIsJoined,customerMode,setCustomerMode,takeawayTime,setTakeawayTime,minTakeawayTimeStr,setMinTakeawayTimeStr,recoveryName,setRecoveryName,recoveryCode,setRecoveryCode,isRecovering,setIsRecovering,recoveredOrder,setRecoveredOrder,recoveryError,setRecoveryError,recoveredOrderId,setRecoveredOrderId,checkingTable,setCheckingTable,orderNotes,setOrderNotes,tableError,setTableError,globalError,setGlobalError,isSubmitting,setIsSubmitting,orderSent,setOrderSent,sentOrderRecap,setSentOrderRecap,sentOrderId,setSentOrderId,isCartOpen,setIsCartOpen,myActiveOrders,setMyActiveOrders,managerWaiter,setManagerWaiter,editingCartIndex,setEditingCartIndex,customerEditingIndex,setCustomerEditingIndex,editCustomerCartItem,cartSubItemName,setCartSubItemName,cartSubItemPrice,setCartSubItemPrice,handleTakeawayConfirm,callWaiterTable,setCallWaiterTable,callWaiterSent,setCallWaiterSent,showCallWaiterModal,setShowCallWaiterModal,isScrolled,setIsScrolled,handleCallWaiter,handleRecoverOrder,handleTableConfirm,selectedProduct,setSelectedProduct,itemNote,setItemNote,specialRequest,setSpecialRequest,weightInfo,setWeightInfo,itemQuantity,setItemQuantity,bowlSize,setBowlSize,bowlBase,setBowlBase,bowlSalume,setBowlSalume,bowlFormaggio,setBowlFormaggio,bowlContorno,setBowlContorno,subItems,setSubItems,subItemName,setSubItemName,subItemPrice,setSubItemPrice,cancelProductModal,handleCustomizationToggle,handleIngredientRemovalToggle,bowlError,setBowlError,isCustomItemOpen,setIsCustomItemOpen,customItemName,setCustomItemName,customItemPrice,setCustomItemPrice,customItemNote,setCustomItemNote,isCustomizing,setIsCustomizing,selectedExtras,setSelectedExtras,removedIngredients,setRemovedIngredients,substitutions,setSubstitutions,inferredBaseIngredients,setInferredBaseIngredients,manualSubstitution,setManualSubstitution,manualExtras,setManualExtras,customExtraInput,setCustomExtraInput,getComputedPrice,isOrderingBlocked,computedPrice,openProductModal,openCustomItemModal,addCustomItemToCart,confirmAddToCart,removeFromCart,generateReceiptPDF,total,isCrossSellModalOpen,setIsCrossSellModalOpen,crossSellSuggestions,setCrossSellSuggestions,handleOrderInitiation,addCrossSellItem,submitOrder,btnClasses,relevantExtras,canCustomize,isTakeawayClosed,takeawayHours,waiterCooldownRemaining
+    products,categoriesOriginal,availableMacros,activeMacroCategory,setActiveMacroCategory,hasStoredTakeaway,setHasStoredTakeaway,activeCategoriesOriginal,allCategories,extrasData,setExtrasData,featuredCrossSellProducts,setFeaturedCrossSellProducts,categoryConfig,setCategoryConfig,tableMappings,setTableMappings,getActiveTableNumber,getActiveTableLabel,activeCategory,setActiveCategory,showAllergensFAQ,setShowAllergensFAQ,showCategoryDropdown,setShowCategoryDropdown,isDrawerOpen,setIsDrawerOpen,cart,setCart,tableNumber,setTableNumber,customerName,setCustomerName,customerLastName,setCustomerLastName,customerPhone,setCustomerPhone,isJoined,setIsJoined,customerMode,setCustomerMode,takeawayTime,setTakeawayTime,minTakeawayTimeStr,setMinTakeawayTimeStr,recoveryName,setRecoveryName,recoveryCode,setRecoveryCode,isRecovering,setIsRecovering,recoveredOrder,setRecoveredOrder,recoveryError,setRecoveryError,recoveredOrderId,setRecoveredOrderId,checkingTable,setCheckingTable,orderNotes,setOrderNotes,tableError,setTableError,globalError,setGlobalError,isSubmitting,setIsSubmitting,orderSent,setOrderSent,sentOrderRecap,setSentOrderRecap,sentOrderId,setSentOrderId,isCartOpen,setIsCartOpen,myActiveOrders,setMyActiveOrders,managerWaiter,setManagerWaiter,editingCartIndex,setEditingCartIndex,customerEditingIndex,setCustomerEditingIndex,editCustomerCartItem,cartSubItemName,setCartSubItemName,cartSubItemPrice,setCartSubItemPrice,handleTakeawayConfirm,callWaiterTable,setCallWaiterTable,callWaiterSent,setCallWaiterSent,showCallWaiterModal,setShowCallWaiterModal,isScrolled,setIsScrolled,handleCallWaiter,handleRecoverOrder,handleTableConfirm,selectedProduct,setSelectedProduct,itemNote,setItemNote,specialRequest,setSpecialRequest,weightInfo,setWeightInfo,itemQuantity,setItemQuantity,bowlSize,setBowlSize,bowlBase,setBowlBase,bowlSalume,setBowlSalume,bowlFormaggio,setBowlFormaggio,bowlContorno,setBowlContorno,subItems,setSubItems,subItemName,setSubItemName,subItemPrice,setSubItemPrice,cancelProductModal,handleCustomizationToggle,handleIngredientRemovalToggle,bowlError,setBowlError,isCustomItemOpen,setIsCustomItemOpen,customItemName,setCustomItemName,customItemPrice,setCustomItemPrice,customItemNote,setCustomItemNote,isCustomizing,setIsCustomizing,selectedExtras,setSelectedExtras,removedIngredients,setRemovedIngredients,substitutions,setSubstitutions,inferredBaseIngredients,setInferredBaseIngredients,manualSubstitution,setManualSubstitution,manualExtras,setManualExtras,customExtraInput,setCustomExtraInput,getComputedPrice,isOrderingBlocked,computedPrice,openProductModal,openCustomItemModal,addCustomItemToCart,confirmAddToCart,removeFromCart,generateReceiptPDF,total,isCrossSellModalOpen,setIsCrossSellModalOpen,crossSellSuggestions,setCrossSellSuggestions,handleOrderInitiation,addCrossSellItem,submitOrder,btnClasses,relevantExtras,canCustomize,isTakeawayClosed,takeawayHours,waiterCooldownRemaining,customerOrdersSettings
   };
 }

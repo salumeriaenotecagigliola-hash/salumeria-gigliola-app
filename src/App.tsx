@@ -78,13 +78,14 @@ export default function App() {
     "beatrice.gigliola8@gmail.com",
     "samgigliola@gmail.com",
     "massfrancy98@gmail.com",
+    "francescogigliola1973@gmail.com",
   ].map(email => email.toLowerCase().trim());
   
   const userEmail = user?.email?.toLowerCase().trim() || "";
   const isAdmin = userEmail !== "" && adminEmails.includes(userEmail);
 
   return (
-    <div className="min-h-screen font-sans bg-brand-paper selection:bg-brand-gold selection:text-brand-black pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+    <div className="min-h-[100dvh] font-sans bg-brand-paper selection:bg-brand-gold selection:text-brand-black pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
       {/* Offline Banner */}
       <AnimatePresence>
         {!isOnline && (

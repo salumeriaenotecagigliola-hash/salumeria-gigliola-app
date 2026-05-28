@@ -2,7 +2,7 @@
 
 This contains everything you need to run your app locally.
 
-**Author**: Beatrice Gigliola
+**Author**: Beatrice Gigliola 
 
 ## Run Locally
 

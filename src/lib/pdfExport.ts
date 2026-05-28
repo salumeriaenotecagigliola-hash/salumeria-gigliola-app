@@ -12,7 +12,7 @@ export async function generateMenuPdf(
     img.crossOrigin = 'Anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null);
-    img.src = '/unnamed.png';
+    img.src = `${import.meta.env.BASE_URL}logo-192.png`;
   });
 
   const categories = Array.from(new Set(products.map(p => p.category.it)));
@@ -161,7 +161,121 @@ export async function generateMenuPdf(
   finalDoc.save("Menu.pdf");
 }
 
-export async function generateReceiptPdfBlob(order: any, paymentAmount: number, paymentMethod: string, paymentDescription: string = "", logoUrl: string = '/unnamed.png') {
+export async function generateFullOrderReceiptPdf(order: any) {
+  const doc = new jsPDF();
+  doc.setFont("helvetica");
+
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.src = `${import.meta.env.BASE_URL}logo-192.png`;
+
+  await new Promise((resolve) => {
+    img.onload = resolve;
+    img.onerror = resolve;
+  });
+
+  const drawHeader = (pdfDoc: any, startY: number) => {
+    let currentY = startY;
+    try {
+      if (img.width > 0) {
+        const pageWidth = pdfDoc.internal.pageSize.getWidth();
+        const imgWidth = 80;
+        const imgHeight = (img.height * imgWidth) / img.width;
+        pdfDoc.addImage(img, "PNG", (pageWidth - imgWidth) / 2, currentY, imgWidth, imgHeight);
+        currentY += imgHeight + 10;
+      } else {
+        pdfDoc.setFontSize(22);
+        pdfDoc.text("Gigliola", 105, currentY + 10, { align: "center" });
+        currentY += 25;
+      }
+    } catch (e) {
+      pdfDoc.setFontSize(22);
+      pdfDoc.text("Gigliola", 105, currentY + 10, { align: "center" });
+      currentY += 25;
+    }
+    return currentY;
+  };
+
+  let y = drawHeader(doc, 10);
+
+  doc.setFontSize(12);
+  doc.text(`Tavolo: ${order.tableNumber}`, 20, y);
+  doc.text(`Data: ${new Date().toLocaleDateString("it-IT")}`, 140, y);
+  y += 10;
+  doc.text(`Cliente: ${order.customerName || "Sconosciuto"}`, 20, y);
+  y += 10;
+
+  doc.text(
+    "----------------------------------------------------------------",
+    20,
+    y,
+  );
+  y += 10;
+
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  const checkPageBreak = (neededHeight: number) => {
+    if (y + neededHeight > pageHeight - 20) {
+      doc.addPage();
+      y = drawHeader(doc, 10);
+      doc.setFontSize(12);
+      doc.text("----------------------------------------------------------------", 20, y);
+      y += 10;
+    }
+  };
+
+  order.items.forEach((item: any) => {
+    checkPageBreak(15);
+    doc.setFont("helvetica", "bold");
+    const nameLines = doc.splitTextToSize(`${item.quantity}x ${item.name}`, 140);
+    doc.text(nameLines, 20, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(`€ ${(item.price * item.quantity).toFixed(2)}`, 170, y, {
+      align: "right",
+    });
+    y += 6 * nameLines.length;
+    
+    const cleanNotes = item.notes?.replace("[AGGIUNTA]", "").trim();
+    if (cleanNotes) {
+      checkPageBreak(10);
+      doc.setFontSize(10);
+      const noteLines = doc.splitTextToSize(`Note: ${cleanNotes}`, 140);
+      doc.text(noteLines, 25, y);
+      doc.setFontSize(12);
+      y += 6 * noteLines.length;
+    }
+    if (item.subItems && item.subItems.length > 0) {
+      doc.setFontSize(10);
+      item.subItems.forEach((si: any) => {
+        checkPageBreak(8);
+        const subItemLines = doc.splitTextToSize(`- ${si.name}`, 130);
+        doc.text(subItemLines, 30, y);
+        doc.text(`€ ${si.price.toFixed(2)}`, 170, y, { align: "right" });
+        y += 6 * subItemLines.length;
+      });
+      doc.setFontSize(12);
+    }
+    y += 2;
+  });
+
+  checkPageBreak(30);
+
+  doc.text(
+    "----------------------------------------------------------------",
+    20,
+    y,
+  );
+  y += 10;
+
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text("Totale", 20, y);
+  doc.text(`€ ${order.total.toFixed(2)}`, 170, y, { align: "right" });
+
+  doc.save(`Ricevuta_Tavolo_${order.tableNumber}_${order.takeawayCode ? order.takeawayCode : order.id.slice(-4).toUpperCase()}.pdf`);
+}
+
+export async function generateReceiptPdfBlob(order: any, paymentAmount: number, paymentMethod: string, paymentDescription: string = "", logoUrl: string = `${import.meta.env.BASE_URL}logo-192.png`) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [80, 200] }); // standard receipt thermal printer format width 80mm
   
   const logoImg = await new Promise<HTMLImageElement | null>((resolve) => {

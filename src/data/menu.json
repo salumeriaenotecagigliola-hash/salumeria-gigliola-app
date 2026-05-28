@@ -1510,10 +1510,10 @@
       "fr": "Boissons Non Alcoolisées"
     },
     "name": {
-      "it": "Acqua (0,5 L)",
-      "en": "Water (0.5 L)",
-      "de": "Wasser (0,5 L)",
-      "fr": "Eau (0.5 L)"
+      "it": "Acqua Frizzante (0,5 L)",
+      "en": "Sparkling Water (0.5 L)",
+      "de": "Mineralwasser (0,5 L)",
+      "fr": "Eau Pétillante (0.5 L)"
     },
     "description": {
       "it": "",
@@ -1522,11 +1522,29 @@
     },
     "price": 0.8,
     "available": true,
-    "allergens": [],
-    "options": [
-      "Naturale",
-      "Frizzante"
-    ]
+    "allergens": []
+  },
+  {
+    "category": {
+      "it": "Bevande Analcoliche",
+      "en": "Soft Drinks",
+      "de": "Alkoholfreie Getränke",
+      "fr": "Boissons Non Alcoolisées"
+    },
+    "name": {
+      "it": "Acqua Naturale (0,5 L)",
+      "en": "Still Water (0.5 L)",
+      "de": "Stilles Wasser (0,5 L)",
+      "fr": "Eau Plate (0.5 L)"
+    },
+    "description": {
+      "it": "",
+      "en": "",
+      "de": ""
+    },
+    "price": 0.8,
+    "available": true,
+    "allergens": []
   },
   {
     "category": {

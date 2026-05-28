@@ -36,7 +36,8 @@ service cloud.firestore {
         request.auth.token.email.lower() == 'gigliolabeatrice@gmail.com' ||
         request.auth.token.email.lower() == 'beatrice.gigliola8@gmail.com' ||
         request.auth.token.email.lower() == 'samgigliola@gmail.com' ||
-        request.auth.token.email.lower() == 'massfrancy98@gmail.com'
+        request.auth.token.email.lower() == 'massfrancy98@gmail.com' ||
+        request.auth.token.email.lower() == 'francescogigliola1973@gmail.com'
       );
     }
     

@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Enoteca Gigliola",
+  "description": "Ordini e Menu Digitale per la Salumeria Enoteca Gigliola",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
