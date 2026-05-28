@@ -8,14 +8,16 @@ import { registerSW } from 'virtual:pwa-register';
 const updateSW = registerSW({ 
   immediate: true,
   onRegisteredSW(swUrl, r) {
-    if (r) {
-      // Check for updates every time the app becomes visible
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          r.update();
-        }
-      });
-    }
+    r && setInterval(() => {
+      r.update();
+    }, 60 * 1000); // Check every minute
+    
+    // Check for updates every time the app becomes visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && r) {
+        r.update();
+      }
+    });
   }
 });
 
