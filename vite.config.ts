@@ -7,13 +7,13 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    base: './',
+    base: '/',
     plugins: [
       react(), 
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['logo-192.png', 'logo-512.png', 'app-icon-192.png', 'app-icon-512.png'],
+        includeAssets: ['logo.png', 'icon.png'],
         workbox: {
           maximumFileSizeToCacheInBytes: 5000000, // 5MB
           cleanupOutdatedCaches: true,
@@ -29,14 +29,8 @@ export default defineConfig(({mode}) => {
           display: 'standalone',
           icons: [
             {
-              src: 'app-icon-192.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'any'
-            },
-            {
-              src: 'app-icon-512.png',
-              sizes: '512x512',
+              src: 'icon.png',
+              sizes: '192x192 512x512',
               type: 'image/png',
               purpose: 'any maskable'
             }
