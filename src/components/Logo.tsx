@@ -1,4 +1,5 @@
 import React from 'react';
+import unnamedLogo from '../unnamed.png';
 
 interface LogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -16,9 +17,10 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
 
   return (
     <img 
-      src={`${import.meta.env.BASE_URL}unnamed.png`}
+      src={unnamedLogo}
       alt="Enoteca Gigliola"
       className={`w-auto object-contain flex-shrink-0 transition-all duration-300 ${sizeClasses[size]} ${className}`}
+      referrerPolicy="no-referrer"
     />
   );
 }
@@ -34,9 +36,10 @@ export function LogoG({ size = 'md', className = '' }: { size?: 'xs' | 'sm' | 'm
 
   return (
     <img 
-      src={`${import.meta.env.BASE_URL}unnamed(1).png`}
+      src={`${import.meta.env.BASE_URL}unnamed%20(1).png`}
       alt="G"
       className={`w-auto object-contain flex-shrink-0 transition-all duration-300 ${sizeClasses[size]} ${className}`}
+      referrerPolicy="no-referrer"
     />
   );
 }

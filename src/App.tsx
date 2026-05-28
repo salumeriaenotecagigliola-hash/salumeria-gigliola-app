@@ -108,9 +108,10 @@ export default function App() {
                 initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                src={`${import.meta.env.BASE_URL}unnamed(1).png`}
+                src={`${import.meta.env.BASE_URL}unnamed%20(1).png`}
                 alt="Gigliola Logo"
                 className="w-40 sm:w-48 h-auto object-contain max-h-[50vh] drop-shadow-md"
+                referrerPolicy="no-referrer"
               />
               <motion.div
                 initial={{ opacity: 0 }}

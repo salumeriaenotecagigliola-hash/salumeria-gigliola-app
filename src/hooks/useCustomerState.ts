@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import unnamedLogo from "../unnamed.png";
 import {
   collection,
   query,
@@ -1228,7 +1229,7 @@ export function useCustomerState(props: Props) {
     doc.setFont("helvetica");
 
     const img = new window.Image();
-    img.src = `${import.meta.env.BASE_URL}unnamed.png`;
+    img.src = unnamedLogo;
 
     await new Promise((resolve) => {
       img.onload = resolve;

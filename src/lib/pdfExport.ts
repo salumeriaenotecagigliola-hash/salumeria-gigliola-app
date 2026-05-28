@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import { Product } from '../types';
+import unnamedLogo from '../unnamed.png';
 
 export async function generateMenuPdf(
   products: Product[],
@@ -12,7 +13,7 @@ export async function generateMenuPdf(
     img.crossOrigin = 'Anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null);
-    img.src = `${import.meta.env.BASE_URL}unnamed.png`;
+    img.src = unnamedLogo;
   });
 
   const categories = Array.from(new Set(products.map(p => p.category.it)));
@@ -167,7 +168,7 @@ export async function generateFullOrderReceiptPdf(order: any) {
 
   const img = new Image();
   img.crossOrigin = "Anonymous";
-  img.src = `${import.meta.env.BASE_URL}unnamed.png`;
+  img.src = unnamedLogo;
 
   await new Promise((resolve) => {
     img.onload = resolve;
@@ -275,7 +276,7 @@ export async function generateFullOrderReceiptPdf(order: any) {
   doc.save(`Ricevuta_Tavolo_${order.tableNumber}_${order.takeawayCode ? order.takeawayCode : order.id.slice(-4).toUpperCase()}.pdf`);
 }
 
-export async function generateReceiptPdfBlob(order: any, paymentAmount: number, paymentMethod: string, paymentDescription: string = "", logoUrl: string = `${import.meta.env.BASE_URL}unnamed.png`) {
+export async function generateReceiptPdfBlob(order: any, paymentAmount: number, paymentMethod: string, paymentDescription: string = "", logoUrl: string = unnamedLogo) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [80, 200] }); // standard receipt thermal printer format width 80mm
   
   const logoImg = await new Promise<HTMLImageElement | null>((resolve) => {

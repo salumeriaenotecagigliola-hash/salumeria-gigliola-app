@@ -15,7 +15,7 @@ export default defineConfig(({}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['logo-192.png', 'logo-512.png', 'g-logo.png'],
+        includeAssets: ['unnamed (1).png'],
         workbox: {
           maximumFileSizeToCacheInBytes: 5000000, // 5MB
           cleanupOutdatedCaches: true,
@@ -32,25 +32,25 @@ export default defineConfig(({}) => {
           display: 'standalone',
           icons: [
             {
-              src: '/g-logo.png',
+              src: '/unnamed%20(1).png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any'
             },
             {
-              src: '/g-logo.png',
+              src: '/unnamed%20(1).png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'maskable'
             },
             {
-              src: '/g-logo.png',
+              src: '/unnamed%20(1).png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any'
             },
             {
-              src: '/g-logo.png',
+              src: '/unnamed%20(1).png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'maskable'
