@@ -1763,7 +1763,7 @@ export default function CustomerInterface(props: Props) {
                         <h4 className="text-[10px] font-black uppercase tracking-widest text-brand-black/60 mb-2">Riepilogo Personalizzazioni</h4>
                         <ul className="text-sm font-medium opacity-80 leading-snug space-y-1">
                           {selectedExtras.map(e => (
-                            <li key={e.name}>+ {e.name} {e.price > 0 ? `(+€${(e.price || 0).toFixed(2)})` : ''}</li>
+                            <li key={e.id}>+ {e.name} {e.price > 0 ? `(+€${(e.price || 0).toFixed(2)})` : ''}</li>
                           ))}
                           {removedIngredients.map(ing => (
                             <li key={ing} className="line-through text-red-500/80">- Senza {ing}</li>
@@ -2547,7 +2547,7 @@ export default function CustomerInterface(props: Props) {
               <div className="overflow-y-auto p-4 pb-12 sm:pb-6 flex flex-col gap-3">
                 {activeCategoriesOriginal.map(catObj => (
                   <button
-                    key={catObj.local}
+                    key={catObj.it}
                     onClick={() => {
                       setActiveCategory(catObj.local);
                       document

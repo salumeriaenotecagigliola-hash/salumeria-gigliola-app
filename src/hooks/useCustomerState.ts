@@ -967,7 +967,18 @@ export function useCustomerState(props: Props) {
     const normalizedIngredients = rawIngredients.map(ing => 
       typeof ing === 'string' ? { name: ing, category: 'varie' } : ing
     );
-    setInferredBaseIngredients(normalizedIngredients);
+    
+    // De-duplicate normalized ingredients by name (case-insensitive) to prevent duplicate key warning
+    const uniqueNormalizedIngredients: typeof normalizedIngredients = [];
+    const seenNames = new Set<string>();
+    for (const ing of normalizedIngredients) {
+      const lowerName = ing.name.toLowerCase().trim();
+      if (!seenNames.has(lowerName)) {
+        seenNames.add(lowerName);
+        uniqueNormalizedIngredients.push(ing);
+      }
+    }
+    setInferredBaseIngredients(uniqueNormalizedIngredients);
     
     setIsCustomizing(false);
 
