@@ -480,9 +480,6 @@ export default function CustomerInterface(props: Props) {
 
       {(!isJoined && ["welcome", "orderTable", "takeaway", "callWaiterForm"].includes(customerMode)) && (
         <div className="bg-brand-paper px-5 py-8 mx-2.5 my-5 rounded-[2.5rem] shadow-2xl shadow-brand-black/5 border border-brand-gold/20 flex flex-col gap-4">
-          <div className="flex justify-center mb-2 mt-2">
-            <Logo size="lg" />
-          </div>
           {isManager ? (
             <>
               <h2 className="text-2xl font-serif text-center font-bold mb-4">Nuovo Ordine</h2>
