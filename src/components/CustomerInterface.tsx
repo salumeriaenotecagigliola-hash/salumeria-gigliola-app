@@ -265,7 +265,7 @@ export default function CustomerInterface(props: Props) {
               className="fixed top-0 left-0 bottom-0 w-[85%] max-w-[320px] bg-brand-paper shadow-2xl z-[210] flex flex-col pt-10 pb-8 px-5 border-r border-brand-gold/10 overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-10 border-b border-brand-black/5 pb-6">
-                <Logo size="lg" />
+                <Logo size="md" />
                 <button
                   onClick={() => setIsDrawerOpen(false)}
                   className="p-2 rounded-full hover:bg-brand-black/5 text-brand-black/50 hover:text-brand-black transition-colors"
@@ -382,10 +382,6 @@ export default function CustomerInterface(props: Props) {
                     {t("staffArea", lang)} <Settings size={14} />
                   </button>
                 )}
-                
-                <div className="flex justify-center mt-auto pt-6 pb-2 pointer-events-none">
-                  <Logo size="md" />
-                </div>
               </div>
             </motion.div>
           </>
@@ -1383,11 +1379,6 @@ export default function CustomerInterface(props: Props) {
           ))}
         </div>
       )}
-
-      {/* Footer Logo */}
-      <footer className="mt-12 mb-20 flex flex-col items-center justify-center gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-        <Logo size="md" />
-      </footer>
 
       {/* Product Modal */}
       <Portal><AnimatePresence>
