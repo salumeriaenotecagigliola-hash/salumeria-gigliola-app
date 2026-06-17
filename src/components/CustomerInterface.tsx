@@ -1311,7 +1311,7 @@ export default function CustomerInterface(props: Props) {
                           <div className="text-right flex flex-col items-end shrink-0 pt-0.5">
                             <span className="font-mono font-black text-[17px] tracking-wide text-brand-gold-dark whitespace-nowrap">
                               {product.category.it.includes("Puglia Bowl")
-                                ? "da € 8.50"
+                                ? `€ ${product.price.toFixed(2)}`
                                 : product.isPricePerKg
                                   ? `€ ${product.price.toFixed(2)} / KG`
                                 : product.price === 0

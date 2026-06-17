@@ -66,6 +66,11 @@ export const getMenu = (): Product[] => {
             pChanged = true;
           }
         }
+
+        if (newP.category && newP.category.it && newP.category.it.includes("Puglia Bowl") && newP.price !== 10.5) {
+          newP.price = 10.5;
+          pChanged = true;
+        }
         
         if (pChanged) changed = true;
         return newP;
