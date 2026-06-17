@@ -1559,16 +1559,11 @@ export default function CustomerInterface(props: Props) {
                             <select
                               value={bowlSize}
                               onChange={(e) => setBowlSize(e.target.value)}
-                              className="w-full bg-white p-4 rounded-xl border border-brand-black/10 focus:border-brand-gold outline-none font-bold"
+                              className="w-full bg-white p-4 rounded-xl border border-brand-black/10 focus:border-brand-gold outline-none font-bold cursor-not-allowed opacity-80"
+                              disabled
                             >
-                              <option value="Piccola (Light) - € 8,50">
-                                Piccola (Light) - € 8,50
-                              </option>
-                              <option value="Media (Standard) - € 10,50">
-                                Media (Standard) - € 10,50
-                              </option>
-                              <option value="Grande (Extra) - € 12,50">
-                                Grande (Extra) - € 12,50
+                              <option value="Dimensione Unica - € 10,50">
+                                Dimensione Unica - € 10,50
                               </option>
                             </select>
                           </div>

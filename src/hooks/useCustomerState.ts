@@ -877,7 +877,7 @@ export function useCustomerState(props: Props) {
   const [specialRequest, setSpecialRequest] = useState("");
   const [weightInfo, setWeightInfo] = useState("");
   const [itemQuantity, setItemQuantity] = useState(1);
-  const [bowlSize, setBowlSize] = useState<string>("Piccola (Light) - € 8,50");
+  const [bowlSize, setBowlSize] = useState<string>("Dimensione Unica - € 10,50");
   const [bowlBase, setBowlBase] = useState<string>("");
   const [bowlSalume, setBowlSalume] = useState<string>("");
   const [bowlFormaggio, setBowlFormaggio] = useState<string>("");
@@ -929,9 +929,7 @@ export function useCustomerState(props: Props) {
     let price = 0;
     if (!product) return price;
     if (product.category.it.includes("Puglia Bowl")) {
-      if (bowlSize.includes("8,50")) price = 8.5;
-      if (bowlSize.includes("10,50")) price = 10.5;
-      if (bowlSize.includes("12,50")) price = 12.5;
+      price = 10.5;
     } else {
       price = product.price;
     }
@@ -949,7 +947,7 @@ export function useCustomerState(props: Props) {
     setSpecialRequest("");
     setWeightInfo("");
     setItemQuantity(1);
-    setBowlSize("Piccola (Light) - € 8,50");
+    setBowlSize("Dimensione Unica - € 10,50");
     setBowlBase("");
     setBowlSalume("");
     setBowlFormaggio("");
@@ -1017,7 +1015,7 @@ export function useCustomerState(props: Props) {
       setItemNote(item.customizationOptions.itemNote || "");
       setSpecialRequest(item.customizationOptions.specialRequest || "");
       setWeightInfo(item.customizationOptions.weightInfo || "");
-      setBowlSize(item.customizationOptions.bowlSize || "Piccola (Light) - € 8,50");
+      setBowlSize(item.customizationOptions.bowlSize || "Dimensione Unica - € 10,50");
       setBowlBase(item.customizationOptions.bowlBase || "");
       setBowlSalume(item.customizationOptions.bowlSalume || "");
       setBowlFormaggio(item.customizationOptions.bowlFormaggio || "");
