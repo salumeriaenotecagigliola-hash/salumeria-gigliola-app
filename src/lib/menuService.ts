@@ -40,31 +40,11 @@ export const getMenu = (): Product[] => {
       // Force sync allergens from menu.json for existing products to ensure the new mapping is applied
       parsed = parsed.map(p => {
         let pChanged = false;
-        const sourceItem = (menuData as any[]).find(m => m.name.it === p.name.it && m.category.it === p.category.it);
         const newP = { ...p };
         
         if (!newP.id) {
           newP.id = generateId();
           pChanged = true;
-        }
-
-        if (sourceItem) {
-          if (sourceItem.allergens && JSON.stringify(newP.allergens) !== JSON.stringify(sourceItem.allergens)) {
-            newP.allergens = sourceItem.allergens;
-            pChanged = true;
-          }
-          if (sourceItem.name && JSON.stringify(newP.name) !== JSON.stringify(sourceItem.name)) {
-            newP.name = sourceItem.name;
-            pChanged = true;
-          }
-          if (sourceItem.category && JSON.stringify(newP.category) !== JSON.stringify(sourceItem.category)) {
-            newP.category = sourceItem.category;
-            pChanged = true;
-          }
-          if (sourceItem.description && JSON.stringify(newP.description) !== JSON.stringify(sourceItem.description)) {
-            newP.description = sourceItem.description;
-            pChanged = true;
-          }
         }
 
         if (newP.category && newP.category.it && newP.category.it.includes("Puglia Bowl") && newP.price !== 10.5) {
