@@ -10,10 +10,11 @@ import {
   onSnapshot,
   doc,
   updateDoc,
+  setDoc,
   limit,
   orderBy
 } from "firebase/firestore";
-import { db, handleFirestoreError, OperationType } from "../lib/firebase";
+import { db, handleFirestoreError, OperationType, auth } from "../lib/firebase";
 import { Extra, Product, OrderItem, OrderStatus, Language } from "../types";
 import {
   ShoppingCart,
@@ -147,12 +148,83 @@ export function useCustomerState(props: Props) {
   } = props;
   
 
-  const products = React.useMemo(
-    () =>
-      getMenu()
-        .filter((p) => p.isVisible !== false),
-    [],
+  const [products, setProducts] = React.useState<Product[]>(() =>
+    getMenu().filter((p) => p.isVisible !== false)
   );
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "settings", "menu"), async (snap) => {
+      if (snap.exists() && snap.data().products) {
+        let remoteMenu = snap.data().products as Product[];
+        
+        // Auto-merge missing Pinse/Padellino from local defaults so they don't get lost
+        const localMenu = getMenu();
+        const pinsePadellino = localMenu.filter(p => p.category.it === "Pinse" || p.category.it === "Padellino");
+        let merged = false;
+        
+        for (const localItem of pinsePadellino) {
+          const existing = remoteMenu.find(r => r.name.it === localItem.name.it && r.category.it === localItem.category.it);
+          if (!existing) {
+            remoteMenu.push(localItem);
+            merged = true;
+          } else if (existing.description?.it !== localItem.description.it || existing.price !== localItem.price) {
+            existing.description = localItem.description;
+            existing.price = localItem.price;
+            existing.allergens = localItem.allergens;
+            merged = true;
+          }
+        }
+        
+        if (merged) {
+            // we merged new items, let's push them back to firestore if admin
+            const adminEmails = [
+              "salumeriaenotecagigliola@gmail.com",
+              "beatrice.gigliola@gmail.com",
+              "beatricegigliola@gmail.com",
+              "gigliolabeatrice@gmail.com",
+              "beatrice.gigliola8@gmail.com",
+              "samgigliola@gmail.com",
+              "massfrancy98@gmail.com",
+              "francescogigliola1973@gmail.com",
+            ].map(email => email.toLowerCase().trim());
+            const userEmail = auth.currentUser?.email?.toLowerCase().trim() || "";
+            const isAdminUser = isManager || (userEmail !== "" && adminEmails.includes(userEmail));
+            
+            if (isAdminUser) {
+              try {
+                await setDoc(doc(db, "settings", "menu"), { products: remoteMenu });
+              } catch (err) {}
+            }
+        }
+        
+        localStorage.setItem("puglia_menu_products", JSON.stringify(remoteMenu));
+        setProducts(remoteMenu.filter((p) => p.isVisible !== false));
+      } else {
+        const adminEmails = [
+          "salumeriaenotecagigliola@gmail.com",
+          "beatrice.gigliola@gmail.com",
+          "beatricegigliola@gmail.com",
+          "gigliolabeatrice@gmail.com",
+          "beatrice.gigliola8@gmail.com",
+          "samgigliola@gmail.com",
+          "massfrancy98@gmail.com",
+          "francescogigliola1973@gmail.com",
+        ].map(email => email.toLowerCase().trim());
+        const userEmail = auth.currentUser?.email?.toLowerCase().trim() || "";
+        const isAdminUser = isManager || (userEmail !== "" && adminEmails.includes(userEmail));
+        
+        if (isAdminUser) {
+          const currentLocal = getMenu();
+          try {
+            await setDoc(doc(db, "settings", "menu"), { products: currentLocal });
+          } catch (err) {
+            console.error("Failed to seed menu to Firestore", err);
+          }
+        }
+      }
+    });
+    return () => unsub();
+  }, [isManager]);
   const categoriesOriginal = React.useMemo(
     () => {
       const cats: { it: string, local: string }[] = [];

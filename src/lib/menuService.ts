@@ -1,5 +1,7 @@
 import { Product } from "../types";
 import menuData from "../data/menu.json";
+import { db } from "./firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 const STORAGE_KEY = "puglia_menu_products";
 const UNDO_STACK_KEY = "puglia_menu_undo_stack";
@@ -72,6 +74,26 @@ export const getMenu = (): Product[] => {
         }
       }
       
+      // Auto-restore missing Pinse and Padellino
+      const initialMenu = menuData as any[];
+      const pinsePadellinoItems = initialMenu.filter(m => m.category.it === "Pinse" || m.category.it === "Padellino");
+      
+      for (const item of pinsePadellinoItems) {
+          const existing = parsed.find(p => p.name.it === item.name.it && p.category.it === item.category.it);
+          if (!existing) {
+              parsed.push({ ...item, id: item.id || generateId() });
+              changed = true;
+          } else {
+              // Force update description and ingredients if they are default/empty or mismatched
+              if (existing.description?.it !== item.description.it || existing.price !== item.price) {
+                  existing.description = item.description;
+                  existing.price = item.price;
+                  existing.allergens = item.allergens;
+                  changed = true;
+              }
+          }
+      }
+      
       if (changed) {
         saveMenuDirectly(parsed);
       }
@@ -95,6 +117,10 @@ export const getMenu = (): Product[] => {
 const saveMenuDirectly = (menu: Product[]) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(menu));
+    // Asynchronously update Firestore settings/menu
+    setDoc(doc(db, "settings", "menu"), { products: menu }).catch((err) => {
+      console.error("Failed to sync menu to Firestore", err);
+    });
   } catch (error) {
     console.error("Error saving menu to localStorage", error);
   }

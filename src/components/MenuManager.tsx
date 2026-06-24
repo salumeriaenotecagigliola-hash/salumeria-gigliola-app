@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Product } from "../types";
 import { getMenu, addMenuItem, updateMenuItem, deleteMenuItem, undoLastAction, canUndo, saveMenu, getCategoryMacros, setCategoryMacro } from "../lib/menuService";
+import { db } from "../lib/firebase";
+import { onSnapshot, doc } from "firebase/firestore";
 import { Plus, Edit2, Trash2, Check, X, FileText, Tag, Euro, AlignLeft, Undo2, ChevronUp, ChevronDown } from "lucide-react";
 import { motion } from "motion/react";
 import { allergenIcons } from "../lib/allergenIcons";
@@ -63,6 +65,30 @@ export default function MenuManager() {
 
   useEffect(() => {
     setProducts(getMenu());
+
+    const unsub = onSnapshot(doc(db, "settings", "menu"), (snap) => {
+      if (snap.exists() && snap.data().products) {
+        let remoteMenu = snap.data().products as Product[];
+        const localMenu = getMenu();
+        const pinsePadellino = localMenu.filter(p => p.category.it === "Pinse" || p.category.it === "Padellino");
+        let merged = false;
+        for (const localItem of pinsePadellino) {
+          const existing = remoteMenu.find(r => r.name.it === localItem.name.it && r.category.it === localItem.category.it);
+          if (!existing) {
+            remoteMenu.push(localItem);
+            merged = true;
+          } else if (existing.description?.it !== localItem.description.it || existing.price !== localItem.price) {
+            existing.description = localItem.description;
+            existing.price = localItem.price;
+            existing.allergens = localItem.allergens;
+            merged = true;
+          }
+        }
+        localStorage.setItem("puglia_menu_products", JSON.stringify(remoteMenu));
+        setProducts(remoteMenu);
+      }
+    });
+    return () => unsub();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

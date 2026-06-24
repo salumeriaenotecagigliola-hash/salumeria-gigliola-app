@@ -1712,5 +1712,155 @@
     "price": 3,
     "available": true,
     "allergens": []
+  },
+  {
+    "category": {
+      "it": "Pinse",
+      "en": "Pinse",
+      "de": "Pinse",
+      "fr": "Pinse"
+    },
+    "name": {
+      "it": "La numero 1",
+      "en": "La numero 1",
+      "de": "La numero 1",
+      "fr": "La numero 1"
+    },
+    "description": {
+      "it": "Mozzarella di bufala, crudo di Parma, puntarelle in olio",
+      "en": "Buffalo mozzarella, Parma ham, chicory catalogna in oil",
+      "de": "Büffelmozzarella, Parmaschinken, Puntarelle in Öl",
+      "fr": "Mozzarella de bufflonne, jambon de Parme, puntarelle à l'huile"
+    },
+    "price": 20.0,
+    "available": true,
+    "allergens": [
+      "Glutine"
+    ]
+  },
+  {
+    "category": {
+      "it": "Pinse",
+      "en": "Pinse",
+      "de": "Pinse",
+      "fr": "Pinse"
+    },
+    "name": {
+      "it": "La numero 2",
+      "en": "La numero 2",
+      "de": "La numero 2",
+      "fr": "La numero 2"
+    },
+    "description": {
+      "it": "Mortadella, stracciatella, pistacchio, pomodori freschi conditi",
+      "en": "Mortadella, stracciatella cheese, pistachio, seasoned fresh tomatoes",
+      "de": "Mortadella, Stracciatella, Pistazien, gewürzte frische Tomaten",
+      "fr": "Mortadelle, stracciatella, pistache, tomates fraîches assaisonnées"
+    },
+    "price": 20.0,
+    "available": true,
+    "allergens": [
+      "Glutine"
+    ]
+  },
+  {
+    "category": {
+      "it": "Pinse",
+      "en": "Pinse",
+      "de": "Pinse",
+      "fr": "Pinse"
+    },
+    "name": {
+      "it": "La numero 3",
+      "en": "La numero 3",
+      "de": "La numero 3",
+      "fr": "La numero 3"
+    },
+    "description": {
+      "it": "Verdure grigliate, carciofini, scaglie di grana speck, noci e guanciale di maiale",
+      "en": "Grilled vegetables, artichokes, parmesan flakes, speck, walnuts and pork guanciale",
+      "de": "Gegrilltes Gemüse, Artischocken, Parmesansplitter, Speck, Walnüsse und Schweinebacke",
+      "fr": "Légumes grillés, artichauts, copeaux de parmesan, speck, noix et guanciale de porc"
+    },
+    "price": 20.0,
+    "available": true,
+    "allergens": [
+      "Glutine"
+    ]
+  },
+  {
+    "category": {
+      "it": "Padellino",
+      "en": "Padellino",
+      "de": "Padellino",
+      "fr": "Padellino"
+    },
+    "name": {
+      "it": "Comu brucia la patella",
+      "en": "Comu brucia la patella",
+      "de": "Comu brucia la patella",
+      "fr": "Comu brucia la patella"
+    },
+    "description": {
+      "it": "Bomba piccante, mortadella, provolone piccante, pancetta coppata",
+      "en": "Spicy bomba, mortadella, spicy provolone cheese, pancetta coppata",
+      "de": "Scharfe Bomba, Mortadella, scharfer Provolone, Pancetta Coppata",
+      "fr": "Bomba épicée, mortadelle, provolone épicé, pancetta coppata"
+    },
+    "price": 12.0,
+    "available": true,
+    "allergens": [
+      "Glutine"
+    ]
+  },
+  {
+    "category": {
+      "it": "Padellino",
+      "en": "Padellino",
+      "de": "Padellino",
+      "fr": "Padellino"
+    },
+    "name": {
+      "it": "Ce si mancia osci",
+      "en": "Ce si mancia osci",
+      "de": "Ce si mancia osci",
+      "fr": "Ce si mancia osci"
+    },
+    "description": {
+      "it": "Stracciatella, pistacchio, prosciutto cotto, salsa boscaiola",
+      "en": "Stracciatella cheese, pistachio, cooked ham, boscaiola sauce",
+      "de": "Stracciatella, Pistazien, gekochter Schinken, Boscaiola-Sauce",
+      "fr": "Stracciatella, pistache, jambon cuit, sauce boscaiola"
+    },
+    "price": 12.0,
+    "available": true,
+    "allergens": [
+      "Glutine"
+    ]
+  },
+  {
+    "category": {
+      "it": "Padellino",
+      "en": "Padellino",
+      "de": "Padellino",
+      "fr": "Padellino"
+    },
+    "name": {
+      "it": "Nu muezzucu a me",
+      "en": "Nu muezzucu a me",
+      "de": "Nu muezzucu a me",
+      "fr": "Nu muezzucu a me"
+    },
+    "description": {
+      "it": "Funghi sott'olio, speck, formaggio svizzero, noci",
+      "en": "Mushrooms in oil, speck, Swiss cheese, walnuts",
+      "de": "Pilze in Öl, Speck, Schweizer Käse, Walnüsse",
+      "fr": "Champignons à l'huile, speck, fromage suisse, noix"
+    },
+    "price": 12.0,
+    "available": true,
+    "allergens": [
+      "Glutine"
+    ]
   }
 ]
