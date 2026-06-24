@@ -144,7 +144,12 @@ export const getMacroCategory = (cat: string) => {
     c.includes("piatti") ||
     c.includes("panini") ||
     c.includes("puglia bowl") ||
-    c.includes("ciotole")
+    c.includes("ciotole") ||
+    c.includes("pinsa") ||
+    c.includes("pinse") ||
+    c.includes("padellino") ||
+    c.includes("fritt") ||
+    c.includes("focacci")
   ) {
     return "Piatti & Specialità";
   }
