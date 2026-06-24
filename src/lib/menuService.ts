@@ -21,6 +21,9 @@ export const setCategoryMacro = (category: string, macro: string) => {
     const config = getCategoryMacros();
     config[category] = macro;
     localStorage.setItem("puglia_category_macros", JSON.stringify(config));
+    setDoc(doc(db, "settings", "macros"), { config }).catch((err) => {
+      console.error("Failed to sync macros to Firestore", err);
+    });
   } catch {}
 };
 
@@ -29,6 +32,9 @@ export const deleteCategoryMacro = (category: string) => {
     const config = getCategoryMacros();
     delete config[category];
     localStorage.setItem("puglia_category_macros", JSON.stringify(config));
+    setDoc(doc(db, "settings", "macros"), { config }).catch((err) => {
+      console.error("Failed to sync macros to Firestore", err);
+    });
   } catch {}
 };
 
@@ -40,60 +46,93 @@ export const getMenu = (): Product[] => {
       let changed = false;
 
       // Force sync allergens from menu.json for existing products to ensure the new mapping is applied
-      parsed = parsed.map(p => {
+      parsed = parsed.map((p) => {
         let pChanged = false;
         const newP = { ...p };
-        
+
         if (!newP.id) {
           newP.id = generateId();
           pChanged = true;
         }
 
-        if (newP.category && newP.category.it && newP.category.it.includes("Puglia Bowl") && newP.price !== 10.5) {
+        if (
+          newP.category &&
+          newP.category.it &&
+          newP.category.it.includes("Puglia Bowl") &&
+          newP.price !== 10.5
+        ) {
           newP.price = 10.5;
           pChanged = true;
         }
-        
+
         if (pChanged) changed = true;
         return newP;
       });
 
       // Auto-restore missing default Aperitivo logic
-      const hasAlcolico = parsed.some(p => p.name?.it === "Aperitivo Alcolico");
-      const hasAnalcolico = parsed.some(p => p.name?.it === "Aperitivo Analcolico");
-      
+      const hasAlcolico = parsed.some(
+        (p) => p.name?.it === "Aperitivo Alcolico",
+      );
+      const hasAnalcolico = parsed.some(
+        (p) => p.name?.it === "Aperitivo Analcolico",
+      );
+
       if (!hasAlcolico || !hasAnalcolico) {
         const initialMenu = menuData as any[];
         if (!hasAlcolico) {
-          const defaultsAlc = initialMenu.find(p => p.name.it === "Aperitivo Alcolico");
-          if (defaultsAlc) { parsed.unshift({ ...defaultsAlc, id: defaultsAlc.id || generateId() } as Product); changed = true; }
+          const defaultsAlc = initialMenu.find(
+            (p) => p.name.it === "Aperitivo Alcolico",
+          );
+          if (defaultsAlc) {
+            parsed.unshift({
+              ...defaultsAlc,
+              id: defaultsAlc.id || generateId(),
+            } as Product);
+            changed = true;
+          }
         }
         if (!hasAnalcolico) {
-          const defaultsAn = initialMenu.find(p => p.name.it === "Aperitivo Analcolico");
-          if (defaultsAn) { parsed.unshift({ ...defaultsAn, id: defaultsAn.id || generateId() } as Product); changed = true; }
+          const defaultsAn = initialMenu.find(
+            (p) => p.name.it === "Aperitivo Analcolico",
+          );
+          if (defaultsAn) {
+            parsed.unshift({
+              ...defaultsAn,
+              id: defaultsAn.id || generateId(),
+            } as Product);
+            changed = true;
+          }
         }
       }
-      
+
       // Auto-restore missing Pinse and Padellino
       const initialMenu = menuData as any[];
-      const pinsePadellinoItems = initialMenu.filter(m => m.category.it === "Pinse" || m.category.it === "Padellino");
-      
+      const pinsePadellinoItems = initialMenu.filter(
+        (m) => m.category.it === "Pinse" || m.category.it === "Padellino",
+      );
+
       for (const item of pinsePadellinoItems) {
-          const existing = parsed.find(p => p.name.it === item.name.it && p.category.it === item.category.it);
-          if (!existing) {
-              parsed.push({ ...item, id: item.id || generateId() });
-              changed = true;
-          } else {
-              // Force update description and ingredients if they are default/empty or mismatched
-              if (existing.description?.it !== item.description.it || existing.price !== item.price) {
-                  existing.description = item.description;
-                  existing.price = item.price;
-                  existing.allergens = item.allergens;
-                  changed = true;
-              }
+        const existing = parsed.find(
+          (p) =>
+            p.name.it === item.name.it && p.category.it === item.category.it,
+        );
+        if (!existing) {
+          parsed.push({ ...item, id: item.id || generateId() });
+          changed = true;
+        } else {
+          // Force update description and ingredients if they are default/empty or mismatched
+          if (
+            existing.description?.it !== item.description.it ||
+            existing.price !== item.price
+          ) {
+            existing.description = item.description;
+            existing.price = item.price;
+            existing.allergens = item.allergens;
+            changed = true;
           }
+        }
       }
-      
+
       if (changed) {
         saveMenuDirectly(parsed);
       }
@@ -103,13 +142,13 @@ export const getMenu = (): Product[] => {
   } catch (error) {
     console.error("Error reading menu from localStorage", error);
   }
-  
+
   // Fallback to initial data, ensuring all items have an id
-  const initialMenu = (menuData as any[]).map(item => ({
+  const initialMenu = (menuData as any[]).map((item) => ({
     ...item,
-    id: item.id || generateId()
+    id: item.id || generateId(),
   })) as Product[];
-  
+
   saveMenuDirectly(initialMenu);
   return initialMenu;
 };
@@ -132,56 +171,148 @@ export const saveMenu = (menu: Product[]) => {
 };
 
 export const pushUndoState = () => {
-    try {
-      const current = localStorage.getItem(STORAGE_KEY);
-      if (current) {
-         let stack = [];
-         try {
-           stack = JSON.parse(localStorage.getItem(UNDO_STACK_KEY) || "[]");
-         } catch {}
-         stack.push(JSON.parse(current));
-         localStorage.setItem(UNDO_STACK_KEY, JSON.stringify(stack.slice(-20))); // keep last 20
-      }
-    } catch {}
+  try {
+    const current = localStorage.getItem(STORAGE_KEY);
+    if (current) {
+      let stack = [];
+      try {
+        stack = JSON.parse(localStorage.getItem(UNDO_STACK_KEY) || "[]");
+      } catch {}
+      stack.push(JSON.parse(current));
+      localStorage.setItem(UNDO_STACK_KEY, JSON.stringify(stack.slice(-20))); // keep last 20
+    }
+  } catch {}
 };
 
 export const undoLastAction = (): boolean => {
-    try {
-       let stack = JSON.parse(localStorage.getItem(UNDO_STACK_KEY) || "[]");
-       if (stack.length > 0) {
-          const prevState = stack.pop();
-          localStorage.setItem(UNDO_STACK_KEY, JSON.stringify(stack));
-          saveMenuDirectly(prevState);
-          return true;
-       }
-    } catch {}
-    return false;
+  try {
+    let stack = JSON.parse(localStorage.getItem(UNDO_STACK_KEY) || "[]");
+    if (stack.length > 0) {
+      const prevState = stack.pop();
+      localStorage.setItem(UNDO_STACK_KEY, JSON.stringify(stack));
+      saveMenuDirectly(prevState);
+      return true;
+    }
+  } catch {}
+  return false;
 };
 
 export const canUndo = (): boolean => {
-    try {
-       const stack = JSON.parse(localStorage.getItem(UNDO_STACK_KEY) || "[]");
-       return stack.length > 0;
-    } catch {
-       return false;
+  try {
+    const stack = JSON.parse(localStorage.getItem(UNDO_STACK_KEY) || "[]");
+    return stack.length > 0;
+  } catch {
+    return false;
+  }
+};
+
+export const autoDetectAllergens = (
+  name: string,
+  description: string,
+  category: string,
+): string[] => {
+  const text = (name + " " + description + " " + category).toLowerCase();
+  const allergens = new Set<string>();
+
+  const check = (keywords: string[], allergen: string) => {
+    if (keywords.some((k) => text.includes(k))) {
+      allergens.add(allergen);
     }
+  };
+
+  check(
+    [
+      "pane",
+      "pizza",
+      "pinsa",
+      "padellino",
+      "farina",
+      "grano",
+      "pasta",
+      "frisella",
+      "tarallo",
+      "biscott",
+      "focaccia",
+    ],
+    "Glutine",
+  );
+  check(
+    [
+      "mozzarella",
+      "burrata",
+      "stracciatella",
+      "formaggio",
+      "grana",
+      "parmigiano",
+      "provola",
+      "provolone",
+      "ricotta",
+      "pecorino",
+      "caciocavallo",
+      "latte",
+      "panna",
+      "burro",
+      "svizzero",
+    ],
+    "Lattosio",
+  );
+  check(["pistacchi", "noci", "mandorle", "nocciole"], "Frutta a guscio");
+  check(["uova", "uovo", "maionese"], "Uova");
+  check(["tonno", "salmone", "acciugh", "alici", "pesce"], "Pesce");
+  check(["gamber", "scampi", "astice", "aragosta"], "Crostacei");
+  check(
+    ["polpo", "calamar", "seppie", "cozze", "vongole", "fasolari"],
+    "Molluschi",
+  );
+  check(["arachidi"], "Arachidi");
+  check(["sedano"], "Sedano");
+  check(["senape"], "Senape");
+  check(["sesamo"], "Sesamo");
+  check(["soia"], "Soia");
+  check(["vino", "aceto"], "Solfiti");
+
+  return Array.from(allergens);
 };
 
 export const addMenuItem = (item: Omit<Product, "id">): Product => {
   pushUndoState();
   const menu = getMenu();
-  const newItem: Product = { ...item, id: generateId() };
+  const detectedAllergens = autoDetectAllergens(
+    item.name.it,
+    item.description?.it || "",
+    item.category.it,
+  );
+  const newItem: Product = {
+    ...item,
+    id: generateId(),
+    allergens: item.allergens?.length > 0 ? item.allergens : detectedAllergens,
+  };
   menu.push(newItem);
   saveMenuDirectly(menu);
   return newItem;
 };
 
-export const updateMenuItem = (id: string, updatedItem: Omit<Product, "id">): Product | null => {
+export const updateMenuItem = (
+  id: string,
+  updatedItem: Omit<Product, "id">,
+): Product | null => {
   const menu = getMenu();
-  const index = menu.findIndex(item => item.id === id);
+  const index = menu.findIndex((item) => item.id === id);
   if (index !== -1) {
     pushUndoState();
-    const itemToSave = { ...updatedItem, id } as Product;
+    const detectedAllergens = autoDetectAllergens(
+      updatedItem.name.it,
+      updatedItem.description?.it || "",
+      updatedItem.category.it,
+    );
+    const itemToSave = {
+      ...updatedItem,
+      id,
+      allergens:
+        updatedItem.allergens?.length > 0
+          ? updatedItem.allergens
+          : detectedAllergens,
+    } as Product;
     menu[index] = itemToSave;
     saveMenuDirectly(menu);
     return itemToSave;
@@ -192,6 +323,6 @@ export const updateMenuItem = (id: string, updatedItem: Omit<Product, "id">): Pr
 export const deleteMenuItem = (id: string): void => {
   const menu = getMenu();
   pushUndoState();
-  const newMenu = menu.filter(item => item.id !== id);
+  const newMenu = menu.filter((item) => item.id !== id);
   saveMenuDirectly(newMenu);
 };

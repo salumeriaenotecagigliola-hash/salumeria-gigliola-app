@@ -22,7 +22,8 @@
     "available": true,
     "allergens": [
       "Glutine",
-      "Latte"
+      "Latte",
+      "Solfiti"
     ]
   },
   {
@@ -100,7 +101,8 @@
     "allergens": [
       "Glutine",
       "Latte",
-      "Frutta a guscio"
+      "Frutta a guscio",
+      "Lattosio"
     ],
     "baseIngredients": [
       {
@@ -192,7 +194,8 @@
     "allergens": [
       "Glutine",
       "Latte",
-      "Pesce"
+      "Pesce",
+      "Lattosio"
     ]
   },
   {
@@ -219,7 +222,8 @@
     "allergens": [
       "Glutine",
       "Pesce",
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -270,7 +274,8 @@
     "available": true,
     "allergens": [
       "Glutine",
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -295,7 +300,8 @@
     "price": 4,
     "available": true,
     "allergens": [
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -320,7 +326,8 @@
     "price": 5,
     "available": true,
     "allergens": [
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -476,7 +483,8 @@
     "price": 10,
     "available": true,
     "allergens": [
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -501,7 +509,8 @@
     "price": 10,
     "available": true,
     "allergens": [
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -553,7 +562,8 @@
     "allergens": [
       "Glutine",
       "Latte",
-      "Frutta a guscio"
+      "Frutta a guscio",
+      "Lattosio"
     ]
   },
   {
@@ -580,7 +590,8 @@
     "allergens": [
       "Glutine",
       "Latte",
-      "Frutta a guscio"
+      "Frutta a guscio",
+      "Lattosio"
     ]
   },
   {
@@ -607,7 +618,8 @@
     "allergens": [
       "Glutine",
       "Pesce",
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -633,7 +645,8 @@
     "available": true,
     "allergens": [
       "Glutine",
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -659,7 +672,8 @@
     "available": true,
     "allergens": [
       "Glutine",
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -685,7 +699,8 @@
     "available": true,
     "allergens": [
       "Glutine",
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -712,7 +727,8 @@
     "allergens": [
       "Glutine",
       "Latte",
-      "Frutta a guscio"
+      "Frutta a guscio",
+      "Lattosio"
     ]
   },
   {
@@ -738,7 +754,8 @@
     "available": true,
     "allergens": [
       "Glutine",
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -818,7 +835,8 @@
     "available": true,
     "allergens": [
       "Glutine",
-      "Latte"
+      "Latte",
+      "Lattosio"
     ]
   },
   {
@@ -845,7 +863,8 @@
     "allergens": [
       "Glutine",
       "Latte",
-      "Frutta a guscio"
+      "Frutta a guscio",
+      "Lattosio"
     ]
   },
   {
@@ -950,7 +969,8 @@
     "price": 4,
     "available": true,
     "allergens": [
-      "Solfiti"
+      "Solfiti",
+      "Pesce"
     ]
   },
   {
@@ -974,7 +994,8 @@
     "price": 4,
     "available": true,
     "allergens": [
-      "Solfiti"
+      "Solfiti",
+      "Pesce"
     ]
   },
   {
@@ -998,7 +1019,8 @@
     "price": 4,
     "available": true,
     "allergens": [
-      "Solfiti"
+      "Solfiti",
+      "Pesce"
     ]
   },
   {
@@ -1022,7 +1044,8 @@
     "price": 5,
     "available": true,
     "allergens": [
-      "Solfiti"
+      "Solfiti",
+      "Pesce"
     ]
   },
   {
@@ -1247,7 +1270,8 @@
     "price": 11.9,
     "available": true,
     "allergens": [
-      "Solfiti"
+      "Solfiti",
+      "Uova"
     ]
   },
   {
@@ -1397,7 +1421,8 @@
     "price": 78,
     "available": true,
     "allergens": [
-      "Solfiti"
+      "Solfiti",
+      "Lattosio"
     ]
   },
   {
@@ -1732,10 +1757,11 @@
       "de": "Büffelmozzarella, Parmaschinken, Puntarelle in Öl",
       "fr": "Mozzarella de bufflonne, jambon de Parme, puntarelle à l'huile"
     },
-    "price": 20.0,
+    "price": 20,
     "available": true,
     "allergens": [
-      "Glutine"
+      "Glutine",
+      "Lattosio"
     ]
   },
   {
@@ -1757,10 +1783,12 @@
       "de": "Mortadella, Stracciatella, Pistazien, gewürzte frische Tomaten",
       "fr": "Mortadelle, stracciatella, pistache, tomates fraîches assaisonnées"
     },
-    "price": 20.0,
+    "price": 20,
     "available": true,
     "allergens": [
-      "Glutine"
+      "Glutine",
+      "Lattosio",
+      "Frutta a guscio"
     ]
   },
   {
@@ -1782,10 +1810,12 @@
       "de": "Gegrilltes Gemüse, Artischocken, Parmesansplitter, Speck, Walnüsse und Schweinebacke",
       "fr": "Légumes grillés, artichauts, copeaux de parmesan, speck, noix et guanciale de porc"
     },
-    "price": 20.0,
+    "price": 20,
     "available": true,
     "allergens": [
-      "Glutine"
+      "Glutine",
+      "Lattosio",
+      "Frutta a guscio"
     ]
   },
   {
@@ -1807,10 +1837,11 @@
       "de": "Scharfe Bomba, Mortadella, scharfer Provolone, Pancetta Coppata",
       "fr": "Bomba épicée, mortadelle, provolone épicé, pancetta coppata"
     },
-    "price": 12.0,
+    "price": 12,
     "available": true,
     "allergens": [
-      "Glutine"
+      "Glutine",
+      "Lattosio"
     ]
   },
   {
@@ -1832,10 +1863,12 @@
       "de": "Stracciatella, Pistazien, gekochter Schinken, Boscaiola-Sauce",
       "fr": "Stracciatella, pistache, jambon cuit, sauce boscaiola"
     },
-    "price": 12.0,
+    "price": 12,
     "available": true,
     "allergens": [
-      "Glutine"
+      "Glutine",
+      "Lattosio",
+      "Frutta a guscio"
     ]
   },
   {
@@ -1857,10 +1890,12 @@
       "de": "Pilze in Öl, Speck, Schweizer Käse, Walnüsse",
       "fr": "Champignons à l'huile, speck, fromage suisse, noix"
     },
-    "price": 12.0,
+    "price": 12,
     "available": true,
     "allergens": [
-      "Glutine"
+      "Glutine",
+      "Lattosio",
+      "Frutta a guscio"
     ]
   }
 ]

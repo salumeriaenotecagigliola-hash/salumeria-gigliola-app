@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
-import { getMenu } from "../lib/menuService";
+import { getMenu, getCategoryMacros } from "../lib/menuService";
 import { Check, Info, ChevronDown, ChevronRight } from "lucide-react";
 
 const getMacroCategory = (cat: string) => {
+  const macrosMap = getCategoryMacros();
+  if (macrosMap[cat]) {
+    return macrosMap[cat];
+  }
+
   const c = cat.toLowerCase();
   if (c.includes("aperitivo") || c.includes("bruschette") || c.includes("friselline") || c.includes("sfiziosit")) {
     return "Food & Sfizi";
